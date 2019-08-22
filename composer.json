@@ -1,7 +1,8 @@
 {
-    "description": "CSV Based Translations for Neos",
+    "description": "CSV cased translations for Neos",
     "type": "neos-package",
     "name": "sitegeist/csvpo",
+    "license": "GPL-3.0-or-later",
     "require": {
         "neos/flow": "*",
         "league/csv": "*"
