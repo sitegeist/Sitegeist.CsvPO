@@ -55,6 +55,16 @@ Rules:
 - CsvPO will use the current locale and if this is not found if traverses up the configured localisation fallback chain
 - Missing translations will render the requested key in Production context and "-- i18n-add/translate __key__ --" in Development.
 
+## Caching
+
+Translations are cached in the `Sitegeist_CsvPO_TranslationCache` Cache.
+A file monitor will invalidate the caches whenever a .csv file is changed 
+inside a Fusion Folder of any Flow-Package. 
+
+If you are storing the translation csv files in another place make sure to
+call `./flow cache:flushone Sitegeist_CsvPO_TranslationCache` after changing
+a translation.csv.
+
 ### Installation 
 
 Sitegeist.CsvPO is available via packagist. Just run `composer require sitegeist/csvpo`.
