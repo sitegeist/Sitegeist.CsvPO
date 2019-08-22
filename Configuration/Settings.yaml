@@ -2,3 +2,7 @@ Neos:
   Fusion:
     defaultContext:
       CsvPO: 'Sitegeist\CsvPO\Eel\TranslationHelper'
+
+Sitegeist:
+  CsvPO:
+    debugMode: false

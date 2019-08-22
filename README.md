@@ -53,7 +53,7 @@ Rules:
 - To access translations just use the intended key on CsvPO object.
 - To apply arguments you can call the key as function and pass an object or array. 
 - CsvPO will use the current locale and if this is not found if traverses up the configured localisation fallback chain
-- Missing translations will return "-- i18n(add/translate __key__) --" instead.
+- Missing translations will render the requested key in Production context and "-- i18n-add/translate __key__ --" in Development.
 
 ### Installation 
 
