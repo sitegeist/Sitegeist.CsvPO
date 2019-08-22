@@ -105,7 +105,7 @@ class Translator implements ProtectedContextAwareInterface
         }
 
         if (array_key_exists($name, $this->translations)) {
-            $translation = 'i18n(translate-' . $name . ')';
+            $translation = '-- i18n(translate-' . $name . ') --';
             foreach ($this->localeIdentifierChain as $localeIdentifier) {
                 if (array_key_exists($localeIdentifier, $this->translations[$name]) && !empty($this->translations[$name][$localeIdentifier])) {
                     $translation = $this->translations[$name][$localeIdentifier];
@@ -118,7 +118,7 @@ class Translator implements ProtectedContextAwareInterface
                 return $translation;
             }
         } else {
-            return 'i18n(add-' . $name . ')';
+            return '-- i18n(add-' . $name . ') --';
         }
     }
 
