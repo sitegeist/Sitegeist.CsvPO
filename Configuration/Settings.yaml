@@ -1,0 +1,4 @@
+Neos:
+  Fusion:
+    defaultContext:
+      CsvPO: 'Sitegeist\CsvPO\Eel\TranslationHelper'

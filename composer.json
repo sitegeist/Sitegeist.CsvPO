@@ -1,0 +1,19 @@
+{
+    "description": "CSV Based Translations for Neos",
+    "type": "neos-package",
+    "name": "sitegeist/csvpo",
+    "require": {
+        "neos/flow": "*",
+        "league/csv": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sitegeist\\CsvPO\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Sitegeist.CsvPO"
+        }
+    }
+}
