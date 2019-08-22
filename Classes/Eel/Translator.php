@@ -1,6 +1,7 @@
 <?php
 namespace Sitegeist\CsvPO\Eel;
 
+use Neos\Cache\Frontend\VariableFrontend;
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\FormatResolver;
@@ -9,8 +10,10 @@ use Neos\Flow\I18n\Locale;
 
 class Translator implements ProtectedContextAwareInterface
 {
-    protected $header;
-    protected $translations;
+    /**
+     * @var string
+     */
+    protected $csvFilename;
 
     /**
      * @var FormatResolver
@@ -25,14 +28,53 @@ class Translator implements ProtectedContextAwareInterface
     protected $localizationService;
 
     /**
+     * @var VariableFrontend
+     * @Flow\Inject
+     */
+    protected $translationCache;
+
+    /**
      * @var array
      */
     protected $localeIdentifierChain;
 
-    public function __construct($csvFile)
+    /**
+     * Translator constructor.
+     * @param string $csvFilename
+     */
+    public function __construct(string $csvFilename)
     {
-        $this->translations = [];
-        if (($csvFileHandle = fopen($csvFile, "r")) !== false) {
+        $this->csvFilename = $csvFilename;
+    }
+
+    /**
+     * @throws \Neos\Cache\Exception
+     */
+    public function initializeObject()
+    {
+        $this->localeIdentifierChain = [];
+        $locale = $this->localizationService->getConfiguration()->getCurrentLocale();
+        foreach ($this->localizationService->getLocaleChain($locale) as $localeInChain) {
+            $this->localeIdentifierChain[] = $localeInChain->__toString();
+        }
+
+        $cacheIdentifier = md5($this->csvFilename);
+        if ($this->translationCache->has($cacheIdentifier)) {
+            $this->translations = $this->translationCache->get($cacheIdentifier);
+        } else {
+            $this->translations = $this->readTranslations($this->csvFilename);
+            $this->translationCache->set($cacheIdentifier, $this->translations);
+        }
+    }
+
+    /**
+     * @param string $csvFilename
+     * @return array
+     */
+    public function readTranslations(string $csvFilename)
+    {
+        $translations = [];
+        if (($csvFileHandle = fopen($csvFilename, "r")) !== false) {
             $header = array_map(function($item){return trim($item);}, fgetcsv($csvFileHandle));
             while (($row = fgetcsv($csvFileHandle)) !== false) {
                 $id = $row[0];
@@ -42,21 +84,20 @@ class Translator implements ProtectedContextAwareInterface
                         $translation[$locale] = trim($row[$index]);
                     }
                 }
-                $this->translations[$id] = $translation;
+                $translations[$id] = $translation;
             }
             fclose($csvFileHandle);
         }
+        return $translations;
     }
 
-    public function initializeObject()
-    {
-        $this->localeIdentifierChain = [];
-        $locale = $this->localizationService->getConfiguration()->getCurrentLocale();
-        foreach ($this->localizationService->getLocaleChain($locale) as $localeInChain) {
-            $this->localeIdentifierChain[] = $localeInChain->__toString();
-        }
-    }
-
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return string
+     * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
+     * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
+     */
     public function __call(string $name , array $arguments)
     {
         if (strpos($name, 'get') === 0) {
@@ -81,6 +122,10 @@ class Translator implements ProtectedContextAwareInterface
         }
     }
 
+    /**
+     * @param string $methodName
+     * @return bool
+     */
     public function allowsCallOfMethod($methodName)
     {
         return true;

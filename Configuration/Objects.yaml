@@ -1,0 +1,9 @@
+'Sitegeist\CsvPO\Eel\Translator':
+  properties:
+    translationCache:
+      object:
+        factoryObjectName: Neos\Flow\Cache\CacheManager
+        factoryMethodName: getCache
+        arguments:
+          1:
+            value: Sitegeist_CsvPO_TranslationCache
