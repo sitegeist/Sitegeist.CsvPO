@@ -3,6 +3,19 @@ Neos:
     defaultContext:
       CsvPO: 'Sitegeist\CsvPO\Eel\TranslationHelper'
 
+  Neos:
+    modules:
+      administration:
+        submodules:
+          example:
+            controller: 'Sitegeist\CsvPO\Controller\TranslationOverrideController'
+            label: 'Translation Labels'
+            description: ''
+            icon: 'language'
+            privilegeTarget: 'Sitegeist.CsvPO:ManageTranslationLabels'
+
 Sitegeist:
   CsvPO:
     debugMode: false
+    packageKeys: []
+

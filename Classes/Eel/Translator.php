@@ -7,6 +7,9 @@ use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\FormatResolver;
 use Neos\Flow\I18n\Service as LocalizationService;
 use Neos\Flow\I18n\Locale;
+use Sitegeist\CsvPO\Domain\Model\TranslationLabel;
+use Sitegeist\CsvPO\Domain\Repository\TranslationLabelRepository;
+use Neos\Utility\Arrays;
 
 class Translator implements ProtectedContextAwareInterface
 {
@@ -32,6 +35,12 @@ class Translator implements ProtectedContextAwareInterface
      * @Flow\Inject
      */
     protected $translationCache;
+
+    /**
+     * @var TranslationLabelRepository
+     * @Flow\Inject
+     */
+    protected $translationLabelRepository;
 
     /**
      * @var bool
@@ -68,7 +77,9 @@ class Translator implements ProtectedContextAwareInterface
         if ($this->translationCache->has($cacheIdentifier)) {
             $this->translations = $this->translationCache->get($cacheIdentifier);
         } else {
-            $this->translations = $this->readTranslations($this->csvFilename);
+            $translations = $this->readTranslations($this->csvFilename);
+            $overrides = $this->readOverrides($this->csvFilename);
+            $this->translations = Arrays::arrayMergeRecursiveOverrule($translations, $overrides);
             $this->translationCache->set($cacheIdentifier, $this->translations);
         }
     }
@@ -95,6 +106,26 @@ class Translator implements ProtectedContextAwareInterface
             fclose($csvFileHandle);
         }
         return $translations;
+    }
+
+    /**
+     * @param string $csvFilename
+     * @return array
+     */
+    public function readOverrides(string $csvFilename)
+    {
+        $overrides = [];
+        $queryResult = $this->translationLabelRepository->findBySource($csvFilename);
+        foreach ($queryResult as $translationLabel) {
+            /**
+             * @var TranslationLabel $translationLabel
+             */
+            if (!array_key_exists($translationLabel->getLabel(), $overrides)) {
+                $overrides[$translationLabel->getLabel()] = [];
+            }
+            $overrides[$translationLabel->getLabel()][$translationLabel->getLocale()] = $translationLabel->getTranslation();
+        }
+        return $overrides;
     }
 
     /**
