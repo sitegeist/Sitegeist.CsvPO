@@ -19,6 +19,11 @@ class Translator implements ProtectedContextAwareInterface
     protected $csvFilename;
 
     /**
+     * @var string
+     */
+    protected $localeIdentifier;
+
+    /**
      * @var FormatResolver
      * @Flow\Inject
      */
@@ -29,6 +34,11 @@ class Translator implements ProtectedContextAwareInterface
      * @Flow\Inject
      */
     protected $localizationService;
+
+    /**
+     * @var array
+     */
+    protected $translations = [];
 
     /**
      * @var VariableFrontend
@@ -56,10 +66,12 @@ class Translator implements ProtectedContextAwareInterface
     /**
      * Translator constructor.
      * @param string $csvFilename
+     * @param string|null $locale
      */
-    public function __construct(string $csvFilename)
+    public function __construct(string $csvFilename, string $localeIdentifier = null)
     {
         $this->csvFilename = $csvFilename;
+        $this->localeIdentifier = $localeIdentifier;
     }
 
     /**
@@ -67,8 +79,9 @@ class Translator implements ProtectedContextAwareInterface
      */
     public function initializeObject()
     {
+        $locale = $this->localeIdentifier ? new Locale($this->localeIdentifier) : $this->localizationService->getConfiguration()->getCurrentLocale();
+
         $this->localeIdentifierChain = [];
-        $locale = $this->localizationService->getConfiguration()->getCurrentLocale();
         foreach ($this->localizationService->getLocaleChain($locale) as $localeInChain) {
             $this->localeIdentifierChain[] = $localeInChain->__toString();
         }
@@ -80,7 +93,7 @@ class Translator implements ProtectedContextAwareInterface
             $translations = $this->readTranslations($this->csvFilename);
             $overrides = $this->readOverrides($this->csvFilename);
             $this->translations = Arrays::arrayMergeRecursiveOverrule($translations, $overrides);
-            $this->translationCache->set($cacheIdentifier, $this->translations);
+            $this->translationCache->set($cacheIdentifier, $this->translations, [$cacheIdentifier]);
         }
     }
 
@@ -160,6 +173,14 @@ class Translator implements ProtectedContextAwareInterface
     }
 
     /**
+     *
+     */
+    public function getAll ()
+    {
+        return array_keys($this->translations);
+    }
+
+    /**
      * @param string $methodName
      * @return bool
      */
@@ -167,4 +188,6 @@ class Translator implements ProtectedContextAwareInterface
     {
         return true;
     }
+
+
 }

@@ -1,0 +1,20 @@
+<f:form
+    action="save"
+    object="{translationLabel}"
+    name="translationLabel"
+>
+    <legend>Update override "{translationLabel.locale}" translation  {translationLabel.label} in source {translationLabel.source}</legend>
+
+    <div class="neos-control-group">
+        <label class="neos-control-label" for="translation">Translation</label>
+        <div class="neos-controls neos-controls-row">
+            <f:form.textfield property="translation" id="translation" class="neos-span12" />
+        </div>
+    </div>
+
+    <div class="neos-footer">
+        <f:link.action action="showSource" class="neos-button" arguments="{source: translationLabel.source}">Back</f:link.action>
+        <input class="neos-button neos-button-primary" type="submit" name="" value="Save">
+    </div>
+
+</f:form>

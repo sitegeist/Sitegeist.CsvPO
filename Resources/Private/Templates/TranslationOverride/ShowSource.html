@@ -1,0 +1,40 @@
+
+<div class="neos-row-fluid">
+    <legend>Translation source: {source}</legend>
+    <table class="neos-table">
+        <thead>
+        <tr>
+            <td></td>
+            <f:for each="{locales}" as="locale">
+                <th colspan="2">{locale}</th>
+            </f:for>
+        </tr>
+        </thead>
+        <tbody>
+        <f:for each="{translationsByLocale}" key="translation" as="translationInLocales">
+            <tr>
+                <td>{translation}</td>
+                <f:for each="{translationInLocales}" key="translationLocale" as="translationInLocale">
+                    <td>
+                        {translationInLocale.result}
+                    </td>
+                    <td>
+                        <f:if condition="{translationInLocale.override}">
+                            <f:then>
+                                <f:link.action action="update" arguments="{translationLabel: translationInLocale.override}">
+                                    <i class="fas fa-pencil-alt icon-white"></i>
+                                </f:link.action>
+                            </f:then>
+                            <f:else>
+                                <f:link.action action="new" arguments="{ source: source, label: translation, locale:translationLocale }">
+                                    <i class="fas fa-plus icon-white"></i>
+                                </f:link.action>
+                            </f:else>
+                        </f:if>
+                    </td>
+                </f:for>
+            </tr>
+        </f:for>
+        </tbody>
+    </table>
+</div>

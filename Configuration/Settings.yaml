@@ -17,5 +17,8 @@ Neos:
 Sitegeist:
   CsvPO:
     debugMode: false
-    packageKeys: []
+    management:
+      packageKeys: []
+      locales: []
+
 
