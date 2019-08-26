@@ -1,9 +1,8 @@
 <?php
-namespace Sitegeist\CsvPO\Eel;
+namespace Sitegeist\CsvPO\Service;
 
 use Neos\Cache\Frontend\VariableFrontend;
 use Neos\Flow\Annotations as Flow;
-use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\FormatResolver;
 use Neos\Flow\I18n\Service as LocalizationService;
 use Neos\Flow\I18n\Locale;
@@ -11,7 +10,7 @@ use Sitegeist\CsvPO\Domain\Model\TranslationLabel;
 use Sitegeist\CsvPO\Domain\Repository\TranslationLabelRepository;
 use Neos\Utility\Arrays;
 
-class Translator implements ProtectedContextAwareInterface
+class TranslationService
 {
     /**
      * @var string
@@ -24,10 +23,9 @@ class Translator implements ProtectedContextAwareInterface
     protected $localeIdentifier;
 
     /**
-     * @var FormatResolver
-     * @Flow\Inject
+     * @var array
      */
-    protected $formatResolver;
+    protected $localeIdentifierChain;
 
     /**
      * @var LocalizationService
@@ -36,9 +34,10 @@ class Translator implements ProtectedContextAwareInterface
     protected $localizationService;
 
     /**
-     * @var array
+     * @var FormatResolver
+     * @Flow\Inject
      */
-    protected $translations = [];
+    protected $formatResolver;
 
     /**
      * @var VariableFrontend
@@ -53,15 +52,9 @@ class Translator implements ProtectedContextAwareInterface
     protected $translationLabelRepository;
 
     /**
-     * @var bool
-     * @Flow\InjectConfiguration(path="debugMode")
-     */
-    protected $debugMode = false;
-
-    /**
      * @var array
      */
-    protected $localeIdentifierChain;
+    protected $translations = [];
 
     /**
      * Translator constructor.
@@ -142,33 +135,42 @@ class Translator implements ProtectedContextAwareInterface
     }
 
     /**
-     * @param string $name
+     * @return string[]
+     */
+    public function getAllLabels(): array
+    {
+        return array_keys($this->translations);
+    }
+
+    /**
+     * @param string $label
+     * @return bool
+     */
+    public function hasTranslation(string $label): bool
+    {
+        return array_key_exists($label, $this->translations);
+    }
+
+    /**
+     * @param string $label
      * @param array $arguments
      * @return string
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function __call(string $name , array $arguments)
+    public function translate(string $label, array $arguments = []): string
     {
-        if (strpos($name, 'get') === 0) {
-            $name = lcfirst(substr($name, 3));
+        $translation = $label;
+        foreach ($this->localeIdentifierChain as $localeIdentifier) {
+            if (array_key_exists($localeIdentifier, $this->translations[$label]) && !empty($this->translations[$label][$localeIdentifier])) {
+                $translation = $this->translations[$label][$localeIdentifier];
+                break;
+            }
         }
-
-        if (array_key_exists($name, $this->translations)) {
-            $translation = $this->debugMode ? '-- i18n-translate ' . $name . ' --' : $name;
-            foreach ($this->localeIdentifierChain as $localeIdentifier) {
-                if (array_key_exists($localeIdentifier, $this->translations[$name]) && !empty($this->translations[$name][$localeIdentifier])) {
-                    $translation = $this->translations[$name][$localeIdentifier];
-                    break;
-                }
-            }
-            if (count($arguments) > 0) {
-                return $this->formatResolver->resolvePlaceholders($translation, $arguments[0]);
-            } else {
-                return $translation;
-            }
+        if (count($arguments) > 0) {
+            return $this->formatResolver->resolvePlaceholders($translation, $arguments[0]);
         } else {
-            return $this->debugMode ? '-- i18n-add ' . $name . ' --' : $name;
+            return $translation;
         }
     }
 

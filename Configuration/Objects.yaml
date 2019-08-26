@@ -1,4 +1,4 @@
-'Sitegeist\CsvPO\Eel\Translator':
+'Sitegeist\CsvPO\Service\TranslationService':
   properties:
     translationCache:
       object:

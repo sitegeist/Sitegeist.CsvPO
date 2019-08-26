@@ -2,9 +2,18 @@
 namespace Sitegeist\CsvPO\Domain\Model;
 
 use Neos\Flow\Annotations as Flow;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @Flow\Entity
+ * @ORM\Table(
+ *    uniqueConstraints={
+ *      @ORM\UniqueConstraint(name="source_label_locale",columns={"source", "label", "locale"})
+ *    },
+ *    indexes={
+ *      @ORM\Index(name="source_index",columns={"source"},options={"lengths": {255}})
+ *    }
+ * )*
  */
 class TranslationLabel
 {

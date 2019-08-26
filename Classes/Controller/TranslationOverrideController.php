@@ -8,7 +8,7 @@ use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Package\PackageManager;
 use Neos\Utility\Files;
 use Sitegeist\CsvPO\Domain\Model\TranslationLabel;
-use Sitegeist\CsvPO\Eel\Translator;
+use Sitegeist\CsvPO\Service\TranslationService;
 use Sitegeist\CsvPO\Domain\Repository\TranslationLabelRepository;
 
 class TranslationOverrideController extends AbstractModuleController
@@ -75,15 +75,14 @@ class TranslationOverrideController extends AbstractModuleController
 
     public function showSourceAction(string $source)
     {
-        $defaultTranslator = new Translator($source);
-        $translations = $defaultTranslator->getAll();
+        $defaultTranslator = new TranslationService($source);
+        $labels = $defaultTranslator->getAllLabels();
         $translationsByLocale = [];
 
         foreach ($this->locales as $locale) {
-            $translator = new Translator($source, $locale);
-            foreach($translations as $translation) {
-
-                $translationsByLocale[$translation][$locale]['result'] = $translator->__call($translation, []);
+            $translator = new TranslationService($source, $locale);
+            foreach($labels as $label) {
+                $translationsByLocale[$label][$locale]['result'] = $translator->translate($label, []);
             }
         }
 
@@ -108,13 +107,13 @@ class TranslationOverrideController extends AbstractModuleController
      * @param string $label
      */
     public function newAction(string $source, string $locale, string $label) {
-        $translator = new Translator($source, $locale);
+        $translator = new TranslationService($source, $locale);
 
         $translationLabel = new TranslationLabel();
         $translationLabel->setLocale($locale);
         $translationLabel->setSource($source);
         $translationLabel->setLabel($label);
-        $translationLabel->setTranslation($translator->__call($label, []));
+        $translationLabel->setTranslation($translator->translate($label, []));
 
         $this->view->assign('translationLabel', $translationLabel);
    }
