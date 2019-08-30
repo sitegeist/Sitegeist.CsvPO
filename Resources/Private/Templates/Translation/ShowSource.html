@@ -1,0 +1,29 @@
+
+<div class="neos-row-fluid">
+    <legend>Translation source: {source.csvFilename}</legend>
+    <table class="neos-table">
+        <thead>
+        <tr>
+            <td></td>
+            <f:for each="{locales}" as="locale">
+                <th colspan="2">{locale}</th>
+            </f:for>
+        </tr>
+        </thead>
+        <tbody>
+        <f:for each="{translationsByLocale}" key="translation" as="translationInLocales">
+            <tr>
+                <td>{translation}</td>
+                <f:for each="{translationInLocales}" key="translationLocale" as="translationInLocale">
+                    <td>
+                        {translationInLocale.result}
+                    </td>
+                    <td>
+                        actions
+                    </td>
+                </f:for>
+            </tr>
+        </f:for>
+        </tbody>
+    </table>
+</div>

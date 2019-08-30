@@ -4,24 +4,20 @@
     <table class="neos-table">
         <thead>
             <tr>
-                <th>Package Name</th>
                 <th>Source</th>
             </tr>
         </thead>
 
         <tbody>
-            <f:for each="{packagesSources}" key="packageKey" as="packagesSource">
-                <f:for each="{packagesSource.sources}" as="source">
+            <f:for each="{translationLabelSources}" as="source">
                 <tr>
-                    <td>{packageKey}</td>
-                    <td>{source}</td>
+                    <td>{source.csvFilename}</td>
                     <td class="neos-priority1 neos-aCenter">
-                        <f:link.action action="showSource" arguments="{source: source}">
+                        <f:link.action action="showSource" arguments="{translationLabelSourceIdentifier: source.csvFilename}">
                             <i class="fas fa-pencil-alt icon-white"></i>
                         </f:link.action>
-                    </td>
+                    </td>s
                 </tr>
-                </f:for>
             </f:for>
         </tbody>
     </table>

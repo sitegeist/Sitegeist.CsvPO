@@ -1,4 +1,4 @@
-'Sitegeist\CsvPO\Service\TranslationService':
+'Sitegeist\CsvPO\Domain\TranslationLabelRepository':
   properties:
     translationCache:
       object:
@@ -8,7 +8,7 @@
           1:
             value: Sitegeist_CsvPO_TranslationCache
 
-'Sitegeist\CsvPO\Controller\TranslationOverrideController':
+'Sitegeist\CsvPO\Controller\TranslationController':
   properties:
     translationCache:
       object:

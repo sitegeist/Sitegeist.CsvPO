@@ -8,7 +8,7 @@ Neos:
       administration:
         submodules:
           example:
-            controller: 'Sitegeist\CsvPO\Controller\TranslationOverrideController'
+            controller: 'Sitegeist\CsvPO\Controller\TranslationController'
             label: 'Translation Labels'
             description: ''
             icon: 'language'
@@ -20,5 +20,7 @@ Sitegeist:
     management:
       packageKeys: []
       locales: []
+      fileExtension: '.translation.csv'
+      resourcePath: 'Private/Fusion'
 
 

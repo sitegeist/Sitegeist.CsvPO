@@ -1,7 +1,7 @@
 privilegeTargets:
   'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
     'Sitegeist.CsvPO:ManageTranslationLabels':
-      matcher: 'method(Sitegeist\CsvPO\Controller\TranslationOverrideController->(index|showSource|new|add|update|save)Action())'
+      matcher: 'method(Sitegeist\CsvPO\Controller\TranslationController->(index|showSource|new|add|update|save)Action())'
 
 roles:
   'Neos.Neos:Administrator':
