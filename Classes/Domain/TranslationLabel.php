@@ -7,18 +7,27 @@ use Neos\Flow\I18n\Locale;
 
 class TranslationLabel
 {
+    /**
+     * @var string
+     */
     protected $identifier;
 
+    /**
+     * @var array
+     */
     protected $translations;
 
+    /**
+     * @var array
+     */
     protected $overrides;
 
     /**
-     * @var FormatResolver
-     * @Flow\Inject
+     * TranslationLabel constructor.
+     * @param string $identifier
+     * @param array $translations
+     * @param array $overrides
      */
-    protected $formatResolver;
-
     public function __construct(string $identifier, array $translations = [], array $overrides = [])
     {
         $this->identifier = $identifier;
@@ -34,22 +43,32 @@ class TranslationLabel
         return $this->identifier;
     }
 
+
     /**
-     * @param array|null $arguments
-     * @param Locale[] $localeChain
+     * @param string $localeIdentifier
+     * @param array|null $localeChain
+     * @return Translation
      */
-    public function translate(array $arguments = null, array $localeChain = null)
+    public function getTranslation(string $localeIdentifier, array $localeChain = null): Translation
     {
-        foreach ($localeChain as $localeIdentifier => $locale) {
-            $translation = $this->overrides[$localeIdentifier] ?? ($this->translations[$localeIdentifier] ?? '');
-            if ($translation) {
-                break;
+        // first check target locale
+        $translation = $this->translations[$localeIdentifier] ?? null;
+        $override = $this->overrides[$localeIdentifier] ?? null;
+        if ($translation || $override) {
+            return new Translation($localeIdentifier, $translation, $override);
+        }
+
+        // if we use the fallback the override is null
+        foreach ($localeChain as $chainLocaleIdentifier => $locale) {
+            $translation = $this->translations[$chainLocaleIdentifier] ?? null;
+            $override = $this->overrides[$chainLocaleIdentifier] ?? null;
+            if ($translation || $override) {
+                return new Translation($chainLocaleIdentifier, $override ?? $translation, null);
             }
         }
-        if (count($arguments) > 0) {
-            return $this->formatResolver->resolvePlaceholders($translation, $arguments[0]);
-        } else {
-            return $translation;
-        }
+
+        // final fallback
+        $localeIdentifier = array_keys($localeChain)[0];
+        return new Translation($localeIdentifier, '', null);
     }
 }

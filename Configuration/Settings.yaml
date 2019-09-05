@@ -7,11 +7,11 @@ Neos:
     modules:
       administration:
         submodules:
-          example:
-            controller: 'Sitegeist\CsvPO\Controller\TranslationController'
-            label: 'Translation Labels'
-            description: ''
+          translation:
+            label: 'Translations'
+            description: 'Show and alter component translations'
             icon: 'language'
+            controller: 'Sitegeist\CsvPO\Controller\TranslationController'
             privilegeTarget: 'Sitegeist.CsvPO:ManageTranslationLabels'
 
 Sitegeist:

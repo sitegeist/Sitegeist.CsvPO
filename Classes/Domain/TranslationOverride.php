@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @Flow\Entity
  * @ORM\Table(
  *    uniqueConstraints={
- *      @ORM\UniqueConstraint(name="source_translation_locale_identifier",columns={"sourceIdentifier", "translationIdentifier", "localeIdentifier"})
+ *      @ORM\UniqueConstraint(name="source_label_locale_identifier",columns={"sourceIdentifier", "labelIdentifier", "localeIdentifier"})
  *    },
  *    indexes={
  *      @ORM\Index(name="sourceIdentifier_index",columns={"sourceIdentifier"},options={"lengths": {255}})
@@ -25,7 +25,7 @@ class TranslationOverride
     /**
      * @var string
      */
-    protected $translationIdentifier;
+    protected $labelIdentifier;
 
     /**
      * @var string
@@ -56,17 +56,17 @@ class TranslationOverride
     /**
      * @return string
      */
-    public function getTranslationIdentifier(): string
+    public function getLabelIdentifier(): string
     {
-        return $this->translationIdentifier;
+        return $this->labelIdentifier;
     }
 
     /**
-     * @param string $translationIdentifier
+     * @param string $labelIdentifier
      */
-    public function setTranslationIdentifier(string $translationIdentifier): void
+    public function setLabelIdentifier(string $labelIdentifier): void
     {
-        $this->translationIdentifier = $translationIdentifier;
+        $this->labelIdentifier = $labelIdentifier;
     }
 
     /**

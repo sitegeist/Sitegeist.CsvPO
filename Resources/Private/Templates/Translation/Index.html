@@ -11,12 +11,12 @@
         <tbody>
             <f:for each="{translationLabelSources}" as="source">
                 <tr>
-                    <td>{source.csvFilename}</td>
+                    <td>{source.title}</td>
                     <td class="neos-priority1 neos-aCenter">
-                        <f:link.action action="showSource" arguments="{translationLabelSourceIdentifier: source.csvFilename}">
+                        <f:link.action action="show" arguments="{sourceIdentifier: source.identifier}">
                             <i class="fas fa-pencil-alt icon-white"></i>
                         </f:link.action>
-                    </td>s
+                    </td>
                 </tr>
             </f:for>
         </tbody>

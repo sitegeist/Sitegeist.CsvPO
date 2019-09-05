@@ -4,16 +4,21 @@ namespace Sitegeist\CsvPO\Eel;
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\Locale;
-use Sitegeist\CsvPO\Domain\TranslationLabelRepository;
+use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Service\TranslationService;
 
 class TranslationSourceConnector implements ProtectedContextAwareInterface
 {
 
     /**
-     * @var TranslationLabelRepository
+     * @var TranslationLabelSource
      */
     protected $translationSource;
+
+    /**
+     * @var string
+     */
+    protected $localeIdentifier;
 
     /**
      * @var Locale[]
@@ -21,45 +26,50 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
     protected $localizationFallbackChain = [];
 
     /**
-     * @var TranslationLabelRepository
+     * @var TranslationLabelSource
      * @Flow\InjectConfiguration(path="debugMode")
      */
     protected $debugMode;
 
     /**
-     * Translator constructor.
-     * @param string $csvFilename
-     * @param Locale $locale
-     * @param Locale[] $localizationFallbacklChain
-     * @param string|null $locale
+     * TranslationSourceConnector constructor.
+     * @param TranslationLabelSource $translationSource
+     * @param string $localeIdentifier
+     * @param array $localizationFallbackChain
      */
-    public function __construct(TranslationLabelRepository $translationSource, array $localizationFallbackChain = [])
+    public function __construct(TranslationLabelSource $translationSource, string $localeIdentifier, array $localizationFallbackChain = [])
     {
         $this->translationSource = $translationSource;
+        $this->localeIdentifier = $localeIdentifier;
         $this->localizationFallbackChain = $localizationFallbackChain;
     }
 
     /**
-     * @param string $identifier
+     * @param string $translationIdentifier
      * @param array $arguments
      * @return string
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function __call(string $identifier , array $arguments)
+    public function __call(string $translationIdentifier , array $arguments)
     {
-        if (strpos($identifier, 'get') === 0) {
-            $identifier = lcfirst(substr($identifier, 3));
+        if (strpos($translationIdentifier, 'get') === 0) {
+            $translationIdentifier = lcfirst(substr($translationIdentifier, 3));
         }
 
-        if ($translationLabel = $this->translationSource->findOneByIdentifier($identifier)) {
-            $translationResult = $translationLabel->translate($arguments, $this->localizationFallbackChain);
+        if ($translationLabel = $this->translationSource->findTranslationLabelByIdentifier($translationIdentifier)) {
+            $translation = $translationLabel->getTranslation($this->localeIdentifier, $this->localizationFallbackChain);
+            if (isset($arguments[0]) && is_array($arguments[0])) {
+                $translationResult = $translation->translate($arguments[0]);
+            } else {
+                $translationResult = $translation->translate();
+            }
             if (empty($translationResult) && $this->debugMode) {
-                return $this->debugMode ? '-- i18n-translate ' . $identifier . ' --' : $identifier;
+                return $this->debugMode ? '-- i18n-translate ' . $translationIdentifier . ' --' : $translationIdentifier;
             }
             return $translationResult;
         } else {
-            return $this->debugMode ? '-- i18n-add ' . $identifier . ' --' : $identifier;
+            return $this->debugMode ? '-- i18n-add ' . $translationIdentifier . ' --' : $translationIdentifier;
         }
     }
 

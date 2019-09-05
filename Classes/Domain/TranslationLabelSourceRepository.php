@@ -5,7 +5,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\Package\FlowPackageInterface;
 use Neos\Utility\Files;
-use Sitegeist\CsvPO\Exception\TranslationSourceNotFoundException;
+use Sitegeist\CsvPO\Exception\TranslationLabelSourceNotFoundException;
 
 class TranslationLabelSourceRepository
 {
@@ -41,20 +41,20 @@ class TranslationLabelSourceRepository
 
     /**
      * @param $identifier
-     * @return TranslationLabelRepository|null
-     * @throws TranslationSourceNotFoundException
+     * @return TranslationLabelSource|null
+     * @throws TranslationLabelSourceNotFoundException
      */
-    public function findOneByIdentifier($identifier): ?TranslationLabelRepository
+    public function findOneByIdentifier($identifier): ?TranslationLabelSource
     {
         if (file_exists($identifier) && is_file($identifier)) {
-            return new TranslationLabelRepository($identifier);
+            return new TranslationLabelSource($identifier);
         } else {
-            throw new TranslationSourceNotFoundException(sprintf('Translation source %s was not found', $identifier));
+            throw new TranslationLabelSourceNotFoundException(sprintf('Translation source %s was not found', $identifier));
         }
     }
 
     /**
-     * @return TranslationLabelRepository[]
+     * @return TranslationLabelSource[]
      */
     public function findAll(): array
     {

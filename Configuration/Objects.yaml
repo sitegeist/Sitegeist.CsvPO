@@ -1,4 +1,4 @@
-'Sitegeist\CsvPO\Domain\TranslationLabelRepository':
+'Sitegeist\CsvPO\Domain\TranslationLabelSource':
   properties:
     translationCache:
       object:

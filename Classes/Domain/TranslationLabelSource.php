@@ -7,17 +7,12 @@ use Sitegeist\CsvPO\Domain\TranslationOverride;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use League\Csv\Reader;
 
-class TranslationLabelRepository
+class TranslationLabelSource
 {
     /**
      * @var string
      */
-    protected $Persistence_Object_Identifier;
-
-    /**
-     * @var string
-     */
-    protected $csvFilename;
+    protected $identifier;
 
     /**
      * @var TranslationLabel[]
@@ -31,27 +26,39 @@ class TranslationLabelRepository
     protected $translationCache;
 
     /**
+     * @var array
+     * @Flow\InjectConfiguration(path="management.fileExtension")
+     */
+    protected $fileExtension;
+
+    /**
+     * @var array
+     * @Flow\InjectConfiguration(path="management.resourcePath")
+     */
+    protected $resourcePath;
+
+    /**
      * @var TranslationOverrideRepository
      * @Flow\Inject
      */
     protected $translationOverrideRepository;
 
-    public function __construct(string $csvFilename)
+    public function __construct(string $identifier)
     {
-        $this->csvFilename = $csvFilename;
-        $this->Persistence_Object_Identifier = $csvFilename;
+        $this->identifier = $identifier;
+        $this->Persistence_Object_Identifier = $identifier;
     }
 
     protected function initializeObject() {
 
         // read data from csv and overrides
-        $cacheIdentifier = md5($this->csvFilename);
+        $cacheIdentifier = md5($this->identifier);
         if ($this->translationCache->has($cacheIdentifier)) {
             $translationData = $this->translationCache->get($cacheIdentifier);
         } else {
             $translationData = [
-                'translations' => $this->readCsvData($this->csvFilename),
-                'overrides' => $this->readOverrideData($this->csvFilename)
+                'translations' => $this->readCsvData($this->identifier),
+                'overrides' => $this->readOverrideData($this->identifier)
             ];
             $this->translationCache->set($cacheIdentifier, $translationData, [$cacheIdentifier]);
         }
@@ -62,7 +69,11 @@ class TranslationLabelRepository
         }
     }
 
-    public function findOneByIdentifier(string $identifier)
+    /**
+     * @param string $identifier
+     * @return TranslationLabel|null
+     */
+    public function findTranslationLabelByIdentifier(string $identifier): ?TranslationLabel
     {
         if (array_key_exists($identifier, $this->translations)) {
             return $this->translations[$identifier];
@@ -72,22 +83,40 @@ class TranslationLabelRepository
     }
 
     /**
-     * @return string
+     * @return TranslationLabel[]
      */
-    public function getCsvFilename(): string
-    {
-        return $this->csvFilename;
-    }
-
-    public function findAll()
+    public function findAllTranslationLabels(): array
     {
         return $this->translations;
     }
 
-    protected function readCsvData ($csvFilename): array
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        $title = $this->identifier;
+        $title = str_replace("resource://", '', $title);
+        $title = str_replace( '/' . $this->resourcePath . '/', ' - ', $title);
+        $title = str_replace($this->fileExtension, '', $title);
+        return $title;
+    }
+
+    /**
+     * @return array
+     */
+    protected function readCsvData (): array
     {
         $translations = [];
-        $csv = Reader::createFromPath($csvFilename, 'r');
+        $csv = Reader::createFromPath($this->identifier, 'r');
         $csv->setHeaderOffset(0);
         $header = $csv->getHeader();
 
@@ -99,18 +128,21 @@ class TranslationLabelRepository
         return $translations;
     }
 
-    protected function readOverrideData ($csvFilename): array
+    /**
+     * @return array
+     */
+    protected function readOverrideData (): array
     {
         $overrides = [];
-        $queryResult = $this->translationOverrideRepository->findBySourceIdentifier($this->csvFilename);
+        $queryResult = $this->translationOverrideRepository->findBySourceIdentifier($this->identifier);
         foreach ($queryResult as $translationLabel) {
             /**
              * @var TranslationOverride $translationLabel
              */
-            if (!array_key_exists($translationLabel->getTranslationIdentifier(), $overrides)) {
-                $overrides[$translationLabel->getTranslationIdentifier()] = [];
+            if (!array_key_exists($translationLabel->getLabelIdentifier(), $overrides)) {
+                $overrides[$translationLabel->getLabelIdentifier()] = [];
             }
-            $overrides[$translationLabel->getTranslationIdentifier()][$translationLabel->getLocaleIdentifier()] = $translationLabel->getTranslation();
+            $overrides[$translationLabel->getLabelIdentifier()][$translationLabel->getLocaleIdentifier()] = $translationLabel->getTranslation();
         }
         return $overrides;
     }

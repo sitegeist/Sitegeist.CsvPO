@@ -12,6 +12,8 @@ use Neos\Utility\Files;
 use Neos\Flow\I18n\Service as LocalizationService;
 
 use Sitegeist\CsvPO\Domain\TranslationLabelSourceRepository;
+use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
+use Sitegeist\CsvPO\Domain\TranslationOverride;
 
 
 class TranslationController extends AbstractModuleController
@@ -47,6 +49,12 @@ class TranslationController extends AbstractModuleController
     protected $translationLabelSourceRepository;
 
     /**
+     * @var TranslationOverrideRepository
+     * @Flow\Inject
+     */
+    protected $translationOverrideRepository;
+
+    /**
      * @var VariableFrontend
      * @Flow\Inject
      */
@@ -58,15 +66,15 @@ class TranslationController extends AbstractModuleController
         $this->view->assign('translationLabelSources', $translationLabelSources);
     }
 
-    public function showSourceAction(string $translationLabelSourceIdentifier)
+    public function showAction(string $sourceIdentifier)
     {
-        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($translationLabelSourceIdentifier);
+        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($sourceIdentifier);
 
         $translationsByLocale = [];
-        foreach ($translationLabelSource->findAll() as $translationLabel) {
+        foreach ($translationLabelSource->findAllTranslationLabels() as $translationLabel) {
             foreach ($this->locales as $localeIdentifier) {
-                $fallbackChain = $this->localizationService->getLocaleChain( new Locale($localeIdentifier) );
-                $translationsByLocale[$translationLabel->getIdentifier()][$localeIdentifier]['result'] = $translationLabel->translate([], $fallbackChain);
+                $localeChain = $this->localizationService->getLocaleChain( new Locale($localeIdentifier) );
+                $translationsByLocale[$translationLabel->getIdentifier()][$localeIdentifier] = $translationLabel->getTranslation($localeIdentifier, $localeChain);
             }
         }
 
@@ -76,47 +84,72 @@ class TranslationController extends AbstractModuleController
     }
 
     /**
-     * @param string $packageKey
-     * @param string $source
-     * @param string $locale
-     * @param string $label
+     * @param string $sourceIdentifier
+     * @param string $localeIdentifier
+     * @param string $labelIdentifier
      */
-    public function newAction(string $source, string $locale, string $label) {
-//        $translator = new TranslationService($source, $locale);
-//
-//        $translationLabel = new TranslationOverride();
-//        $translationLabel->setLocale($locale);
-//        $translationLabel->setSource($source);
-//        $translationLabel->setLabel($label);
-//        $translationLabel->setTranslation($translator->translate($label, []));
-//
-//        $this->view->assign('translationLabel', $translationLabel);
+    public function newOverrideAction(string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier) {
+        $localeChain = $this->localizationService->getLocaleChain( new Locale($localeIdentifier) );
+
+        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($sourceIdentifier);
+        $label = $translationLabelSource->findTranslationLabelByIdentifier($labelIdentifier);
+        $translation = $label->getTranslation($localeIdentifier, $localeChain);
+
+        $translationOverride = new TranslationOverride();
+        $translationOverride->setSourceIdentifier($sourceIdentifier);
+        $translationOverride->setLabelIdentifier($labelIdentifier);
+        $translationOverride->setLocaleIdentifier($localeIdentifier);
+        $translationOverride->setTranslation($translation->getTranslation() ?? '');
+
+        $this->view->assign('source', $translationLabelSource);
+        $this->view->assign('translation', $translation);
+        $this->view->assign('translationOverride', $translationOverride);
    }
 
     /**
      * @param TranslationOverride $translationLabel
      */
-    public function addAction(TranslationOverride $translationLabel) {
-//        $this->translationLabelRepository->add($translationLabel);
-//        $this->translationCache->flushByTag(md5($translationLabel->getSource()));
-//        $this->forward('showSource', null, null, ['source' => $translationLabel->getSource()]);
+    public function addOverrideAction(TranslationOverride $translationOverride) {
+        $this->translationOverrideRepository->add($translationOverride);
+        $this->translationCache->flushByTag(md5($translationOverride->getSourceIdentifier()));
+        $this->forward('show', null, null, ['sourceIdentifier' => $translationOverride->getSourceIdentifier()]);
+    }
+
+    /**
+     * @param TranslationOverride $translationOverride
+     */
+    public function updateOverrideAction( string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier )
+    {
+        $translationOverride = $this->translationOverrideRepository->findOneSpecific($sourceIdentifier, $localeIdentifier, $labelIdentifier);
+        $localeChain = $this->localizationService->getLocaleChain( new Locale($translationOverride->getLocaleIdentifier()) );
+
+        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($translationOverride->getSourceIdentifier());
+        $label = $translationLabelSource->findTranslationLabelByIdentifier($translationOverride->getLabelIdentifier());
+        $translation = $label->getTranslation($localeIdentifier, $localeChain);
+
+        $this->view->assign('source', $translationLabelSource);
+        $this->view->assign('translation', $translation);
+        $this->view->assign('translationOverride', $translationOverride);
+        $this->view->assign('translationLabel', $translationOverride);
     }
 
     /**
      * @param TranslationOverride $translationLabel
      */
-    public function updateAction(TranslationOverride $translationLabel)
+    public function saveOverrideAction(TranslationOverride $translationOverride)
     {
-//        $this->view->assign('translationLabel', $translationLabel);
+        $this->translationOverrideRepository->update($translationOverride);
+        $this->translationCache->flushByTag(md5($translationOverride->getSourceIdentifier()));
+        $this->forward('show', null, null, ['sourceIdentifier' => $translationOverride->getSourceIdentifier()]);
     }
 
     /**
      * @param TranslationOverride $translationLabel
      */
-    public function saveAction(TranslationOverride $translationLabel)
+    public function deleteOverrideAction(TranslationOverride $translationOverride)
     {
-//        $this->translationLabelRepository->update($translationLabel);
-//        $this->translationCache->flushByTag(md5($translationLabel->getSource()));
-//        $this->forward('showSource', null, null, ['source' => $translationLabel->getSource()]);
+        $this->translationOverrideRepository->remove($translationOverride);
+        $this->translationCache->flushByTag(md5($translationOverride->getSourceIdentifier()));
+        $this->forward('show', null, null, ['sourceIdentifier' => $translationOverride->getSourceIdentifier()]);
     }
 }

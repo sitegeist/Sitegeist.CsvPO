@@ -30,7 +30,7 @@ class TranslationHelper implements ProtectedContextAwareInterface
         $currentLocale = $this->localisationService->getConfiguration()->getCurrentLocale();
         $localeChain = $this->localisationService->getLocaleChain($currentLocale);
 
-        return new TranslationSourceConnector($translationSource, $localeChain);
+        return new TranslationSourceConnector($translationSource, $currentLocale, $localeChain);
     }
 
     /**
