@@ -32,12 +32,6 @@ class TranslationController extends AbstractModuleController
 
     /**
      * @var array
-     * @Flow\InjectConfiguration(path="management.packageKeys")
-     */
-    protected $packageKeys;
-
-    /**
-     * @var array
      * @Flow\InjectConfiguration(path="management.locales")
      */
     protected $locales;
