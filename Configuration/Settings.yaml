@@ -1,3 +1,26 @@
+Sitegeist:
+  CsvPO:
+
+    # render visible hint for missing translations
+    # is enabled by default for debug mode
+    debugMode: false
+
+    # Control which translation options are available in
+    # the backend module and the cli
+    management:
+
+      # package keys to scan for translation files
+      packageKeys: []
+
+      # list of locales to manage in the backend module
+      locales: ['en']
+
+      # file extension to search for translations
+      fileExtension: '.translation.csv'
+
+      # folder inside the package resources to search for translations
+      resourcePath: 'Private/Fusion'
+
 Neos:
   Fusion:
     defaultContext:
@@ -13,14 +36,5 @@ Neos:
             icon: 'language'
             controller: 'Sitegeist\CsvPO\Controller\TranslationController'
             privilegeTarget: 'Sitegeist.CsvPO:ManageTranslationLabels'
-
-Sitegeist:
-  CsvPO:
-    debugMode: false
-    management:
-      packageKeys: []
-      locales: []
-      fileExtension: '.translation.csv'
-      resourcePath: 'Private/Fusion'
 
 

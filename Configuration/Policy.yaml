@@ -9,3 +9,9 @@ roles:
       -
         privilegeTarget: 'Sitegeist.CsvPO:ManageTranslationLabels'
         permission: GRANT
+
+  'Sitegeist.CsvPO:TranslationEditor':
+    privileges:
+      -
+        privilegeTarget: 'Sitegeist.CsvPO:ManageTranslationLabels'
+        permission: GRANT
