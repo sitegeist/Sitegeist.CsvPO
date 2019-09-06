@@ -1,0 +1,31 @@
+<f:form
+    action="addOverride"
+    object="{translationOverride}"
+    name="translationOverride"
+>
+    <f:form.hidden property="sourceIdentifier"  />
+    <f:form.hidden property="labelIdentifier" />
+    <f:form.hidden property="localeIdentifier"  />
+
+    <legend>Create override for translation of "{translationOverride.labelIdentifier}" in source "{source.title}"</legend>
+
+    <div class="neos-control-group">
+        <label class="neos-control-label" for="translation">Original translation</label>
+        <div class="neos-controls neos-controls-row">
+            <input type="text" value="{translation.translation}" class="neos-span12" readonly />
+        </div>
+    </div>
+
+    <div class="neos-control-group">
+        <label class="neos-control-label" for="translation">Translation</label>
+        <div class="neos-controls neos-controls-row">
+            <f:form.textfield property="translation" id="translation" class="neos-span12" />
+        </div>
+    </div>
+
+    <div class="neos-footer">
+        <f:link.action action="showSource" class="neos-button" arguments="{sourceIdentifier: source.identifier}">Back</f:link.action>
+        <input class="neos-button neos-button-primary" type="submit" name="" value="Add Override">
+    </div>
+
+</f:form>

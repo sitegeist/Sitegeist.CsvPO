@@ -1,0 +1,51 @@
+<f:form
+    action="saveOverride"
+    object="{translationOverride}"
+    name="translationOverride"
+>
+
+    <legend>Update override for translation of "{translationOverride.labelIdentifier}" in source "{source.title}"</legend>
+
+    <div class="neos-control-group">
+        <label class="neos-control-label" for="translation">Original translation</label>
+        <div class="neos-controls neos-controls-row">
+            <input type="text" value="{translation.translation}" class="neos-span12" readonly />
+        </div>
+    </div>
+
+    <div class="neos-control-group">
+        <label class="neos-control-label" for="translation">Translation</label>
+        <div class="neos-controls neos-controls-row">
+            <f:form.textfield property="translation" id="translation" class="neos-span12" />
+        </div>
+    </div>
+
+    <div class="neos-footer">
+        <button class="neos-button neos-button-danger" title="delete overrode" data-toggle="modal" href="#deleteOverride">
+            Delete override
+        </button>
+        <f:link.action action="showSource" class="neos-button" arguments="{source: translationLabel.source}">Back</f:link.action>
+        <input class="neos-button neos-button-primary" type="submit" name="" value="Save Override">
+    </div>
+
+</f:form>
+
+
+<div class="neos-hide" id="deleteOverride">
+    <div class="neos-modal">
+        <div class="neos-modal-header">
+            <button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
+            <div class="neos-header">Delete override</div>
+        </div>
+        <div class="neos-modal-footer">
+            <f:form
+                action="deleteOverride"
+                object="{translationOverride}"
+                name="translationOverride"
+            >
+                <input class="neos-button neos-button-primary" type="submit" name="" value="Delete">
+            </f:form>
+        </div>
+    </div>
+    <div class="neos-modal-backdrop neos-in"></div>
+</div>

@@ -1,0 +1,24 @@
+
+<div class="neos-row-fluid">
+    <legend>Available translation sources</legend>
+    <table class="neos-table">
+        <thead>
+            <tr>
+                <th>Source</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <f:for each="{translationLabelSources}" as="source">
+                <tr>
+                    <td>{source.title}</td>
+                    <td class="neos-priority1 neos-aCenter">
+                        <f:link.action action="show" arguments="{sourceIdentifier: source.identifier}">
+                            <i class="fas fa-pencil-alt icon-white"></i>
+                        </f:link.action>
+                    </td>
+                </tr>
+            </f:for>
+        </tbody>
+    </table>
+</div>

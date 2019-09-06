@@ -4,7 +4,8 @@
     "name": "sitegeist/csvpo",
     "license": "GPL-3.0-or-later",
     "require": {
-        "neos/flow": "^5.0"
+        "neos/flow": "^5.0",
+        "league/csv": "*"
     },
     "autoload": {
         "psr-4": {
