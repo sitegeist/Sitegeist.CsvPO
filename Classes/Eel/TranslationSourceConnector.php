@@ -4,6 +4,7 @@ namespace Sitegeist\CsvPO\Eel;
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\Locale;
+use Neos\Flow\I18n\FormatResolver;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Service\TranslationService;
 
@@ -19,6 +20,12 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
      * @var string
      */
     protected $localeIdentifier;
+
+    /**
+     * @var FormatResolver
+     * @Flow\Inject
+     */
+    protected $formatResolver;
 
     /**
      * @var Locale[]
@@ -58,11 +65,11 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
         }
 
         if ($translationLabel = $this->translationSource->findTranslationLabelByIdentifier($translationIdentifier)) {
-            $translation = $translationLabel->getTranslation($this->localeIdentifier, $this->localizationFallbackChain);
+            $translation = $translationLabel->findTranslationForLocaleChain($this->localizationFallbackChain);
             if (isset($arguments[0]) && is_array($arguments[0])) {
-                $translationResult = $translation->translate($arguments[0]);
+                $translationResult = $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments[0]);
             } else {
-                $translationResult = $translation->translate();
+                $translationResult = $translation->__toString();
             }
             if (empty($translationResult) && $this->debugMode) {
                 return $this->debugMode ? '-- i18n-translate ' . $translationIdentifier . ' --' : $translationIdentifier;

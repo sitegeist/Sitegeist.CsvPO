@@ -60,12 +60,17 @@ class TranslationLabelSource
                 'translations' => $this->readCsvData($this->identifier),
                 'overrides' => $this->readOverrideData($this->identifier)
             ];
-            $this->translationCache->set($cacheIdentifier, $translationData, [$cacheIdentifier]);
+            $this->translationCache->set($cacheIdentifier, $translationData);
         }
 
         // instantiate the translation objects
-        foreach ($translationData['translations'] as $labelIdentifier => $translation) {
-            $this->translations[$labelIdentifier] = new TranslationLabel($labelIdentifier, $translation, $translationData['overrides'][$labelIdentifier] ?? []);
+        foreach (array_keys($translationData['translations']) as $labelIdentifier) {
+            $this->translations[$labelIdentifier] = new TranslationLabel(
+                $labelIdentifier,
+                $translationData['translations'][$labelIdentifier]['description'] ?? '',
+                $translationData['translations'][$labelIdentifier] ?? [],
+                $translationData['overrides'][$labelIdentifier] ?? []
+            );
         }
     }
 
@@ -145,5 +150,16 @@ class TranslationLabelSource
             $overrides[$translationLabel->getLabelIdentifier()][$translationLabel->getLocaleIdentifier()] = $translationLabel->getTranslation();
         }
         return $overrides;
+    }
+
+    /**
+     * Flus the caches of this translation source
+     */
+    public function flushCaches (): void
+    {
+        $cacheIdentifier = md5($this->identifier);
+        if  ($this->translationCache->has($cacheIdentifier)) {
+            $this->translationCache->remove($cacheIdentifier);
+        }
     }
 }

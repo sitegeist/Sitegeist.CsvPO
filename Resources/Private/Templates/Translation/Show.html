@@ -1,4 +1,3 @@
-
 <div class="neos-row-fluid">
     <legend>{source.title}</legend>
     <table class="neos-table">
@@ -6,30 +5,34 @@
             <tr>
                 <td></td>
                 <f:for each="{locales}" as="locale">
-                    <th colspan="2">{locale}</th>
+                    <th colspan="2"><strong>{locale}</strong></th>
                 </f:for>
             </tr>
         </thead>
         <tbody>
-            <f:for each="{translationsByLocale}" key="translationIdentifier" as="translationInLocales">
+            <f:for each="{translationsByLocale}" key="translationIdentifier" as="labelInformations">
                 <tr>
-                    <td>{translationIdentifier}</td>
-                    <f:for each="{translationInLocales}" key="localeIdentifier" as="translationInLocale">
-                        <td style="line-height: 1.5em; padding: 1em; border-left: 1px solid #222 ">
+                    <td style="line-height: 1.5em; padding: 1em;">
+                        <div>
+                            <strong>{labelInformations.identifier}</strong>
+                        </div>
+                        <f:if condition="{labelInformations.description}">
+                            <f:then>
+                                <div style="font-style: italic; color: grey; padding-top: .5em;">
+                                    {labelInformations.description}
+                                </div>
+                            </f:then>
+                        </f:if>
+                    </td>
+                    <f:for each="{labelInformations.translations}" key="localeIdentifier" as="translationInLocale">
+                        <td style="line-height: 1.5em; padding: 1em; border-left: 1px solid #222;">
                             <div>
-                                <f:if condition="{translationInLocale.override}">
-                                    <f:then>
-                                        {translationInLocale.override}
-                                    </f:then>
-                                    <f:else>
-                                        {translationInLocale.translation}
-                                    </f:else>
-                                </f:if>
+                                {translationInLocale}
                             </div>
-                            <f:if condition="({translationInLocale.translation} {translationInLocale.override}) || ({localeIdentifier} != {translationInLocale.localeIdentifier})">
+                            <f:if condition="({translationInLocale.override} || {translationInLocale.fallback}))">
                                 <div style="font-style: italic; color: grey; padding-top: .5em;">
                                     <f:if condition="{translationInLocale.override}"><strike>{translationInLocale.translation}</strike><br/></f:if>
-                                    <f:if condition="{localeIdentifier} != {translationInLocale.localeIdentifier}">from: {translationInLocale.localeIdentifier}</f:if>
+                                    <f:if condition="{translationInLocale.fallback}">fallback from: {translationInLocale.fallbackLocaleIdentifier}</f:if>
                                 </div>
                             </f:if>
                         </td>
@@ -46,7 +49,6 @@
                                     </f:link.action>
                                 </f:else>
                             </f:if>
-
                         </td>
                     </f:for>
                 </tr>

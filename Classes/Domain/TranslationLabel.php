@@ -13,6 +13,11 @@ class TranslationLabel
     protected $identifier;
 
     /**
+     * @var string
+     */
+    protected $description;
+
+    /**
      * @var array
      */
     protected $translations;
@@ -28,9 +33,10 @@ class TranslationLabel
      * @param array $translations
      * @param array $overrides
      */
-    public function __construct(string $identifier, array $translations = [], array $overrides = [])
+    public function __construct(string $identifier, string $description, array $translations = [], array $overrides = [])
     {
         $this->identifier = $identifier;
+        $this->description = $description;
         $this->translations = $translations;
         $this->overrides = $overrides;
     }
@@ -43,32 +49,41 @@ class TranslationLabel
         return $this->identifier;
     }
 
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
 
     /**
-     * @param string $localeIdentifier
      * @param array|null $localeChain
      * @return Translation
      */
-    public function getTranslation(string $localeIdentifier, array $localeChain = null): Translation
+    public function findTranslationForLocaleChain(array $localeChain): Translation
     {
+        // current locale Identifier
+        $localeIdentifier = array_keys($localeChain)[0];
+
         // first check target locale
         $translation = $this->translations[$localeIdentifier] ?? null;
         $override = $this->overrides[$localeIdentifier] ?? null;
         if ($translation || $override) {
-            return new Translation($localeIdentifier, $translation, $override);
+            return new Translation($translation, $override);
         }
 
         // if we use the fallback the override is null
-        foreach ($localeChain as $chainLocaleIdentifier => $locale) {
-            $translation = $this->translations[$chainLocaleIdentifier] ?? null;
-            $override = $this->overrides[$chainLocaleIdentifier] ?? null;
-            if ($translation || $override) {
-                return new Translation($chainLocaleIdentifier, $override ?? $translation, null);
+        foreach ($localeChain as $fallbackLocaleIdentifier => $locale) {
+            $fallbackTranslation = $this->translations[$fallbackLocaleIdentifier] ?? null;
+            $fallbackOverride = $this->overrides[$fallbackLocaleIdentifier] ?? null;
+            if ($fallbackTranslation || $fallbackOverride) {
+                $fallback = $fallbackOverride ??  $fallbackTranslation;
+                return new Translation($translation, $override, $fallback, $fallbackLocaleIdentifier);
             }
         }
 
-        // final fallback
-        $localeIdentifier = array_keys($localeChain)[0];
-        return new Translation($localeIdentifier, '', null);
+        // final fallback return empty
+        return new Translation();
     }
 }

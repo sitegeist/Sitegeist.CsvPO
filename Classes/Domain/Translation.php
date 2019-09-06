@@ -1,9 +1,6 @@
 <?php
 namespace Sitegeist\CsvPO\Domain;
 
-use Neos\Flow\Annotations as Flow;
-use Neos\Flow\I18n\FormatResolver;
-
 class Translation
 {
     /**
@@ -19,19 +16,19 @@ class Translation
     /**
      * @var string
      */
-    protected $localeIdentifier;
+    protected $fallback;
 
     /**
-     * @var FormatResolver
-     * @Flow\Inject
+     * @var string
      */
-    protected $formatResolver;
+    protected $fallbackLocaleIdentifier;
 
-    public function __construct(string $localeIdentifier, string $translation = null , string $override = null)
+    public function __construct(string $translation = null , string $override = null, string $fallback = null, string $fallbackLocaleIdentifier = null)
     {
-        $this->translation = $translation;
-        $this->override = $override;
-        $this->localeIdentifier = $localeIdentifier;
+        $this->translation = empty($translation) ? null : $translation;
+        $this->override =  empty($override) ? null : $override;
+        $this->fallback =  empty($fallback) ? null : $fallback;
+        $this->fallbackLocaleIdentifier = $fallbackLocaleIdentifier;
     }
 
     /**
@@ -53,21 +50,25 @@ class Translation
     /**
      * @return string
      */
-    public function getLocaleIdentifier(): string
+    public function getFallback(): ?string
     {
-        return $this->localeIdentifier;
+        return $this->fallback;
     }
 
     /**
-     * @param array|null $arguments
+     * @return string
      */
-    public function translate(array $arguments = null): string
+    public function getFallbackLocaleIdentifier(): ?string
     {
-        if ($arguments) {
-            return $this->formatResolver->resolvePlaceholders($this->override ?? $this->translation, $arguments);
-        } else {
-            return $this->override ?? $this->translation;
-        }
+        return $this->fallbackLocaleIdentifier;
     }
 
+    /**
+     * Get the current translation value, respects fallback and overrides
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->override ?? $this->translation ?? $this->fallback ?? '';
+    }
 }

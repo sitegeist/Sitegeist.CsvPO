@@ -7,13 +7,3 @@
         arguments:
           1:
             value: Sitegeist_CsvPO_TranslationCache
-
-'Sitegeist\CsvPO\Controller\TranslationController':
-  properties:
-    translationCache:
-      object:
-        factoryObjectName: Neos\Flow\Cache\CacheManager
-        factoryMethodName: getCache
-        arguments:
-          1:
-            value: Sitegeist_CsvPO_TranslationCache
