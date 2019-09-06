@@ -1,6 +1,8 @@
 # Sitegeist.CsvPO
 
-## Neos package to colocate translations in csv files with fusion-components
+## Neos package for managing translations 
+
+<img src="./Resources/Public/Images/backend-module.png" width="800" />
 
 This package allows to manage translations as csv-files directly in the 
 fusion component folder and provides easy access to translations in the 
@@ -78,7 +80,6 @@ The Translations backend module allows to show all translations of the given sou
 Translation overrides can be defined and are visualized for the editors aswell 
 as fallbacks.
 
-<img src="./Resources/Public/Images/backend-module.png" width="800" />
 
 The backend module is accessible to the roles `Administrator` and 
 `TranslationEditor`. `Editors` must be given access to modify the 
