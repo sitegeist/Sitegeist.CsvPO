@@ -1,5 +1,5 @@
 {
-    "description": "CSV based translations for Neos, with presentational fusion and afx in mind",
+    "description": "CSV based translations handling for Neos for easy use and colocation with presentational fusion",
     "type": "neos-package",
     "name": "sitegeist/csvpo",
     "license": "GPL-3.0-or-later",
