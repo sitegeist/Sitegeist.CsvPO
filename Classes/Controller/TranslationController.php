@@ -143,8 +143,9 @@ class TranslationController extends AbstractModuleController
      */
     public function deleteOverrideAction(TranslationOverride $translationOverride)
     {
+        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($translationOverride->getSourceIdentifier());
         $this->translationOverrideRepository->remove($translationOverride);
-        $this->translationCache->flushByTag(md5($translationOverride->getSourceIdentifier()));
+        $translationLabelSource->flushCaches();
         $this->redirect('show', null, null, ['sourceIdentifier' => $translationOverride->getSourceIdentifier()]);
     }
 }
