@@ -1,6 +1,6 @@
 # Sitegeist.CsvPO
 
-## Neos package for managing translations 
+## Neos package for managing translations from csv files with a backend module
 
 <img src="./Resources/Public/Images/backend-module.png" width="800" />
 
