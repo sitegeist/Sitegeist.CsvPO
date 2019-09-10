@@ -1,17 +1,16 @@
 # Sitegeist.CsvPO
 
-## Neos package for managing translations from csv files with a backend module
-
-<img src="./Resources/Public/Images/backend-module.png" width="800" />
+## Neos package for managing translations in csv files and a backend module for overrides
 
 This package allows to manage translations as csv-files directly in the 
 fusion component folder and provides easy access to translations in the 
-style of css-modules.
+style of css-modules. The Neos locale chain and the translation formatters 
+are used as usual.
 
 The package comes with a backend module for overriding translations and 
 cli commands to bake overrides back to the csv files.
 
-The Neos locale chain and the translation formatters are used.
+<img src="./Resources/Public/Images/backend-module.png" width="800" />
 
 ## Authors & Sponsors
 
