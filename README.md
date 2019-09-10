@@ -20,7 +20,8 @@ Advantages:
 
 Drawback:
 - No pluralforms are supported (yet)
-- This solution is probably not ideal for really large numbers of locales (>10) as the files will get out of hand   
+- This solution is probably not ideal for really large numbers of locales (>10) as the files will get out of hand
+- Translations for NodeType inspector labels are not supported
 
 ## Authors & Sponsors
 
