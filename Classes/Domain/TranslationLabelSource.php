@@ -153,7 +153,7 @@ class TranslationLabelSource
     }
 
     /**
-     * Flus the caches of this translation source
+     * Flush the caches of this translation source
      */
     public function flushCaches (): void
     {

@@ -1,16 +1,26 @@
 # Sitegeist.CsvPO
 
-## Neos package for managing translations in csv files and a backend module for overrides
+## Neos package for easy handling of translation labels in csv files, with a backend module for label overriding and cli support
 
 This package allows to manage translations as csv-files directly in the 
-fusion component folder and provides easy access to translations in the 
-style of css-modules. The Neos locale chain and the translation formatters 
-are used as usual.
-
-The package comes with a backend module for overriding translations and 
-cli commands to bake overrides back to the csv files.
+fusion component folder with easy access in the style of css-modules.
 
 <img src="./Resources/Public/Images/backend-module.png" width="800" />
+
+The package comes with a backend module for overriding translations and 
+cli commands to bake overrides back to the csv files for versioning.
+
+Advantages:
+- Translations are managed directly in a *translation.csv file in the fusion component folder
+- Translations can be aded and used translations as simple as possible
+- Translations can be edited in any spreadsheet app to spot missing translations directly
+- Translations an be altered by customers and managers via backend module
+- Altered translations can be stored back to the translation files via cli 
+- The Neos locale fallback chain and the formatters are used as in the classic xliff translations   
+
+Drawback:
+- No pluralforms are supported (yet)
+- This solution is probably not ideal for really large numbers of locales (>10) as the files will get out of hand   
 
 ## Authors & Sponsors
 
@@ -90,7 +100,11 @@ CvsPO comes with several cli commands
 
 - `csvpo:list` Show a list of all translation sources
 - `csvpo:show` Show the translations of the specified source
+- `csvpo:showAll` Show the translations of the specified source
 - `csvpo:bake` Bake the translations of the specified source back to the csv file
+- `csvpo:bakeAll` Bake the overrides all source back to the csv files
+- `csvpo:reset` Reset translation overrides of the specified source
+- `csvpo:bakeAll` Bake translation overrides of all sources
 
 ## Configuration
 

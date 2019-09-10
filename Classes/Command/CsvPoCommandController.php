@@ -5,8 +5,10 @@ use League\Csv\Reader;
 use League\Csv\Writer;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Cli\CommandController;
+use phpDocumentor\Reflection\Types\Boolean;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
+use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Domain\TranslationLabelSourceRepository;
 use Neos\Flow\I18n\Service as LocalizationService;
 use Neos\Flow\I18n\Locale;
@@ -50,69 +52,203 @@ class CsvPoCommandController extends CommandController
     }
 
     /**
+     * Show all translations
+     *
+     * @param $identifier the identifier to show (globbing is supported)
+     */
+    public function showAllCommand(string $identifier = null) {
+        $allSources = $this->translationLabelSourceRepository->findAll();
+        foreach ($allSources as $source) {
+            $sourceIdentifier = $source->getIdentifier();
+            if (!is_null($identifier) && $identifier != $sourceIdentifier) {
+                continue;
+            }
+            $this->renderSource($source);
+        }
+
+        $this->output->outputLine('Legend:');
+        $this->output->outputLine('- Translation');
+        $this->output->outputLine('- <comment>O::Override</comment>');
+        $this->output->outputLine('- <info>F::Fallback</info>');
+    }
+
+    /**
      * Show the translations of the specified source
-     * @param $identifier
+     *
+     * @param $identifier the identifier to show (globbing is supported)
      */
     public function showCommand(string $identifier) {
         $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
-        $rows = [];
-        foreach ($source->findAllTranslationLabels() as $translationLabel) {
-            $row = [$translationLabel->getIdentifier()];
-            foreach ($this->locales as $localeIdentifier) {
-                $localeChain = $this->localizationService->getLocaleChain( new Locale($localeIdentifier) );
-                $translation = $translationLabel->findTranslationForLocaleChain($localeChain);
-                if ($translation->getOverride()) {
-                    $text = '<info>' . $translation->getOverride() . '</info>';
-                } else if ($translation->getFallback()) {
-                    $text = '<comment>' . $translation->getFallback() . '</comment>';
-                } else {
-                    $text = $translation->__toString();
-                }
-                $row[] =$text ;
-            }
-            $rows[] = $row;
+        if($source) {
+            $this->renderSource($source);
         }
-        $this->output->outputTable($rows, array_merge([' '], $this->locales));
+
+        $this->output->outputLine('Legend:');
+        $this->output->outputLine('- Translation');
+        $this->output->outputFormatted('- <comment>O::Override</comment>');
+        $this->output->outputLine('- <info>F::Fallback</info>');
+    }
+
+    /**
+     * Bake the all translation overrides to the csv files
+     *
+     */
+    public function bakeAllCommand() {
+        $allSources = $this->translationLabelSourceRepository->findAll();
+        foreach ($allSources as $source) {
+            $this->bakeSource($source);
+        }
     }
 
     /**
      * Bake the translations of the specified source back to the csv files
      *
      * @param string $identifier the translation csv that shall be updated
-     * @param bool $deleteOverrides Delete override records after updating
      */
-    public function bakeCommand(string $identifier, bool $deleteOverrides = false) {
-        $overrides = $this->translationOverrideRepository->findBySourceIdentifier($identifier);
+    public function bakeCommand(string $identifier) {
+        $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
+        $this->bakeSource($source);
+    }
+
+    /**
+     * Reset all overrides
+     *
+     * @param string $identifier
+     */
+    public function resetAllCommand(bool $yes = false) {
+        if (!$yes) {
+            $confirmation = $this->output->askConfirmation('Are you sure', false);
+            if (!$confirmation) {
+                return;
+            }
+        }
+
+        $allSources = $this->translationLabelSourceRepository->findAll();
+        foreach ($allSources as $source) {
+            $this->resetSource($source);
+        }
+    }
+
+    /**
+     * Reset all overrices for the specified to the csv file
+     *
+     * @param string $identifier
+     */
+    public function resetCommand(string $identifier, bool  $yes = false) {
+        if (!$yes) {
+            $confirmation = $this->output->askConfirmation('Are you sure', false);
+            if (!$confirmation) {
+                return;
+            }
+        }
+
+        $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
+        $this->resetSource($source);
+    }
+
+    /**
+     * @param \Sitegeist\CsvPO\Domain\TranslationLabelSource $source
+     * @throws \Neos\Flow\I18n\Exception\InvalidLocaleIdentifierException
+     */
+    protected function renderSource(\Sitegeist\CsvPO\Domain\TranslationLabelSource $source): void
+    {
+        $this->output->outputLine($source->getTitle() . ' : ' . $source->getIdentifier());
+
+        $rows = [];
+        foreach ($source->findAllTranslationLabels() as $translationLabel) {
+            $row = [$translationLabel->getIdentifier()];
+            foreach ($this->locales as $localeIdentifier) {
+                $localeChain = $this->localizationService->getLocaleChain(new Locale($localeIdentifier));
+                $translation = $translationLabel->findTranslationForLocaleChain($localeChain);
+                if ($translation->getOverride()) {
+                    $text = '<info>O::' . $translation->getOverride() . '</info>';
+                } else if ($translation->getFallback()) {
+                    $text = '<comment>F::' . $translation->getFallback() . '</comment>';
+                } else {
+                    $text = $translation->__toString();
+                }
+                $row[] = $text;
+            }
+            $rows[] = $row;
+        }
+
+        $this->output->outputTable($rows, array_merge([' '], $this->locales));
+        $this->output->outputLine();
+    }
+
+    /**
+     * @param TranslationLabelSource $source
+     * @throws \League\Csv\CannotInsertRecord
+     * @throws \Sitegeist\CsvPO\Exception\TranslationLabelSourceNotFoundException
+     */
+    protected function bakeSource(TranslationLabelSource $source): void
+    {
+        $this->output->outputLine(sprintf('Bake %s : %s', $source->getTitle(), $source->getIdentifier()));
+
+        $overrides = $this->translationOverrideRepository->findBySourceIdentifier($source->getIdentifier());
 
         // read
-        $csvReader = Reader::createFromPath($identifier, 'r');
+        $csvReader = Reader::createFromPath($source->getIdentifier(), 'r');
         $csvReader->setHeaderOffset(0);
         $header = $csvReader->getHeader();
         $records = iterator_to_array($csvReader->getRecords());
 
-        // update
+        // update records
         /**
          * @var $override TranslationOverride
          */
         foreach ($overrides as $override) {
+            // add missing locales to header
+            if (!in_array($override->getLocaleIdentifier(), $header)) {
+                $header[] = $override->getLocaleIdentifier();
+            }
             foreach ($records as $key => $record) {
                 if ($record['id'] == $override->getLabelIdentifier()) {
-                    $this->output->outputLine(sprintf('Update label <info>%s</info> from <info>"%s"</info> to <info>"%s"</info>',  $record['id'], $records[$key][$override->getLocaleIdentifier()] ?? '', $override->getTranslation()));
+                    $this->output->outputLine(sprintf('- update csv label <info>%s</info> in locale <info>%s</info>', $override->getLabelIdentifier(), $override->getLocaleIdentifier()));
                     $records[$key][$override->getLocaleIdentifier()] = $override->getTranslation();
-                }
-                if ($deleteOverrides) {
-                    $this->translationOverrideRepository->remove($override);
                 }
             }
         }
 
-        // save
-        $csvWriter = Writer::createFromPath($identifier, 'w');
+        $this->output->outputLine();
+
+        // save records
+        $csvWriter = Writer::createFromPath($source->getIdentifier(), 'w');
         $csvWriter->insertOne($header);
-        $csvWriter->insertAll($records);
+        foreach($records as $record) {
+            $row = [];
+            foreach ($header as $column) {
+                $row[$column] = $record[$column] ?? '';
+            }
+            $csvWriter->insertOne($row);
+        }
 
         // flush caches
-        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
-        $translationLabelSource->flushCaches();
+        $source->flushCaches();
+    }
+
+    /**
+     * @param TranslationLabelSource $source
+     * @throws \League\Csv\CannotInsertRecord
+     * @throws \Sitegeist\CsvPO\Exception\TranslationLabelSourceNotFoundException
+     */
+    protected function resetSource(TranslationLabelSource $source): void
+    {
+        $this->output->outputLine(sprintf('Reset %s : %s', $source->getTitle(), $source->getIdentifier()));
+
+        // remove overrides
+        $overrides = $this->translationOverrideRepository->findBySourceIdentifier($source->getIdentifier());
+        foreach($overrides as $override) {
+            /**
+             * @var TranslationOverride $override
+             */
+            $this->output->outputLine(sprintf('- remove csv label override <info>%s</info> in locale <info>%s</info>', $override->getLabelIdentifier(), $override->getLocaleIdentifier()));
+            $this->translationOverrideRepository->remove($override);
+        }
+
+        $this->output->outputLine();
+
+        // flush caches
+        $source->flushCaches();
     }
 }
