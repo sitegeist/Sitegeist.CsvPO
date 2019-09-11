@@ -12,7 +12,7 @@ cli commands to bake overrides back to the csv files for versioning.
 
 Advantages:
 - Translations are managed directly in a *translation.csv file in the fusion component folder
-- Translations can be aded and used translations as simple as possible
+- Translations can be aded and used in a very simple way
 - Translations can be edited in any spreadsheet app to spot missing translations directly
 - Translations can be altered by customers and managers via backend module
 - Altered translations can be stored back to the translation files via cli 
