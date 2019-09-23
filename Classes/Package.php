@@ -7,7 +7,6 @@ use Neos\Flow\Core\Bootstrap;
 use Neos\Flow\Monitor\FileMonitor;
 use Neos\Flow\Package\Package as BasePackage;
 use Neos\Flow\Package\PackageManager;
-use Neos\Flow\Package\PackageManagerInterface;
 
 class Package extends BasePackage
 {
@@ -30,7 +29,7 @@ class Package extends BasePackage
                     /**
                      * @var PackageManager $packageManager
                      */
-                    $packageManager = $bootstrap->getEarlyInstance(PackageManagerInterface::class);
+                    $packageManager = $bootstrap->getEarlyInstance(PackageManager::class);
                     foreach ($packageManager->getFlowPackages() as $packageKey => $package) {
                         $fusionDirectory = $package->getResourcesPath() . 'Private/Fusion';
                         if (is_dir($fusionDirectory)) {
