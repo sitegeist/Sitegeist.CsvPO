@@ -39,6 +39,7 @@ allows to access the translations in fusion and afx.
 Example.fusion
 ```
 prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
+    @context.globalTranslations = Vendor.Site:GlobalTranslations
     @context.translations = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Example.translation.csv')}
 
     renderer = afx`
@@ -46,6 +47,25 @@ prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
             {translations.title} <br/>
             {translations.text({info:'foo'})}<br/>
             {translations.missing}
+        </div>
+    `
+}
+```
+
+Global translations can be extracted into a component to be used across the project:
+```
+prototype(Vendor.Site:GlobalTranslations) < prototype(Neos.Fusion:Component) {
+    renderer = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Globals.translation.csv')}
+
+}
+
+prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
+    @context.globalTranslations = Vendor.Site:GlobalTranslations
+
+    renderer = afx`
+        <div>
+            {globalTranslations.title} <br/>
+            {globalTranslations.text({info:'foo'})}<br/>
         </div>
     `
 }
