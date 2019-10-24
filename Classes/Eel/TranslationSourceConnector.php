@@ -5,6 +5,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\FormatResolver;
+use Neos\Flow\I18n\Service as LocalizationService;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Service\TranslationService;
 
@@ -12,14 +13,15 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
 {
 
     /**
+     * @var LocalizationService
+     * @Flow\Inject
+     */
+    protected $localisationService;
+
+    /**
      * @var TranslationLabelSource
      */
     protected $translationSource;
-
-    /**
-     * @var string
-     */
-    protected $localeIdentifier;
 
     /**
      * @var FormatResolver
@@ -30,7 +32,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
     /**
      * @var Locale[]
      */
-    protected $localizationFallbackChain = [];
+    protected $localizationFallbackChainCache = [];
 
     /**
      * @var TranslationLabelSource
@@ -44,11 +46,9 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
      * @param string $localeIdentifier
      * @param array $localizationFallbackChain
      */
-    public function __construct(TranslationLabelSource $translationSource, string $localeIdentifier, array $localizationFallbackChain = [])
+    public function __construct(TranslationLabelSource $translationSource)
     {
         $this->translationSource = $translationSource;
-        $this->localeIdentifier = $localeIdentifier;
-        $this->localizationFallbackChain = $localizationFallbackChain;
     }
 
     /**
@@ -60,12 +60,23 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
      */
     public function __call(string $translationIdentifier , array $arguments)
     {
+        $localeIdentifier = $this->localisationService->getConfiguration()->getCurrentLocale();
+        $localeIdentifierString = (string)$localeIdentifier;
+
+        // determine the fallback chain and cache the result for the current locale
+        if (array_key_exists($localeIdentifierString, $this->localizationFallbackChainCache)) {
+            $localizationFallbackChain = $this->localizationFallbackChainCach[$localeIdentifierString];
+        } else {
+            $localizationFallbackChain = $this->localisationService->getLocaleChain($localeIdentifier);
+            $this->localizationFallbackChainCach[$localeIdentifierString] = $localizationFallbackChain;
+        }
+
         if (strpos($translationIdentifier, 'get') === 0) {
             $translationIdentifier = lcfirst(substr($translationIdentifier, 3));
         }
 
         if ($translationLabel = $this->translationSource->findTranslationLabelByIdentifier($translationIdentifier)) {
-            $translation = $translationLabel->findTranslationForLocaleChain($this->localizationFallbackChain);
+            $translation = $translationLabel->findTranslationForLocaleChain($localizationFallbackChain);
             if (isset($arguments[0]) && is_array($arguments[0])) {
                 $translationResult = $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments[0]);
             } else {
