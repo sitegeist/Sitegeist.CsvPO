@@ -9,7 +9,7 @@ use Neos\Flow\I18n\Service as LocalizationService;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Service\TranslationService;
 
-class TranslationSourceConnector implements ProtectedContextAwareInterface
+class TranslationSourceConnector implements ProtectedContextAwareInterface, \JsonSerializable
 {
 
     /**
@@ -89,6 +89,21 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface
         } else {
             return $this->debugMode ? '-- i18n-add ' . $translationIdentifier . ' --' : $translationIdentifier;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize(): array
+    {
+        $result = [];
+
+        foreach ($this->translationSource->findAllTranslationLabels() as $translationLabel) {
+            $translation = $translationLabel->findTranslationForLocaleChain($this->localizationFallbackChain);
+            $result[$translationLabel->getIdentifier()] = (string) $translation;
+        }
+
+        return $result;
     }
 
     /**
