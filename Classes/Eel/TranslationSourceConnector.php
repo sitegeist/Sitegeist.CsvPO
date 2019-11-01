@@ -60,16 +60,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
      */
     public function __call(string $translationIdentifier , array $arguments)
     {
-        $localeIdentifier = $this->localisationService->getConfiguration()->getCurrentLocale();
-        $localeIdentifierString = (string)$localeIdentifier;
-
-        // determine the fallback chain and cache the result for the current locale
-        if (array_key_exists($localeIdentifierString, $this->localizationFallbackChainCache)) {
-            $localizationFallbackChain = $this->localizationFallbackChainCach[$localeIdentifierString];
-        } else {
-            $localizationFallbackChain = $this->localisationService->getLocaleChain($localeIdentifier);
-            $this->localizationFallbackChainCach[$localeIdentifierString] = $localizationFallbackChain;
-        }
+        $localizationFallbackChain = $this->getCurrentLocalizationFallbackChain();
 
         if (strpos($translationIdentifier, 'get') === 0) {
             $translationIdentifier = lcfirst(substr($translationIdentifier, 3));
@@ -92,17 +83,34 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
     }
 
     /**
+     * @return array
+     */
+    protected function getCurrentLocalizationFallbackChain(): array
+    {
+        $localeIdentifier = $this->localisationService->getConfiguration()->getCurrentLocale();
+        $localeIdentifierString = (string)$localeIdentifier;
+
+        // determine the fallback chain and cache the result for the current locale
+        if (array_key_exists($localeIdentifierString, $this->localizationFallbackChainCache)) {
+            $localizationFallbackChain = $this->localizationFallbackChainCach[$localeIdentifierString];
+        } else {
+            $localizationFallbackChain = $this->localisationService->getLocaleChain($localeIdentifier);
+            $this->localizationFallbackChainCach[$localeIdentifierString] = $localizationFallbackChain;
+        }
+        return $localizationFallbackChain;
+    }
+
+    /**
      * @inheritDoc
      */
     public function jsonSerialize(): array
     {
         $result = [];
-
+        $localizationFallbackChain = $this->getCurrentLocalizationFallbackChain();
         foreach ($this->translationSource->findAllTranslationLabels() as $translationLabel) {
-            $translation = $translationLabel->findTranslationForLocaleChain($this->localizationFallbackChain);
+            $translation = $translationLabel->findTranslationForLocaleChain($localizationFallbackChain);
             $result[$translationLabel->getIdentifier()] = (string) $translation;
         }
-
         return $result;
     }
 
@@ -114,6 +122,4 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
     {
         return true;
     }
-
-
 }
