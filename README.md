@@ -39,14 +39,14 @@ allows to access the translations in fusion and afx.
 Example.fusion
 ```
 prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
-    @context.globalTranslations = Vendor.Site:GlobalTranslations
-    @context.translations = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Example.translation.csv')}
+
+    i18n = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Example.translation.csv')}
 
     renderer = afx`
         <div>
-            {translations.title} <br/>
-            {translations.text({info:'foo'})}<br/>
-            {translations.missing}
+            {props.i18n.title} <br/>
+            {props.i18n.text({info:'foo'})}<br/>
+            {props.i18n.missing}
         </div>
     `
 }
@@ -60,12 +60,13 @@ prototype(Vendor.Site:GlobalTranslations) < prototype(Neos.Fusion:Component) {
 }
 
 prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
-    @context.globalTranslations = Vendor.Site:GlobalTranslations
+
+    i18n = Vendor.Site:GlobalTranslations
 
     renderer = afx`
         <div>
-            {globalTranslations.title} <br/>
-            {globalTranslations.text({info:'foo'})}<br/>
+            {props.i18n.title} <br/>
+            {props.i18n.text({info:'foo'})}<br/>
         </div>
     `
 }
