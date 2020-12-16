@@ -15,6 +15,9 @@
     "extra": {
         "neos": {
             "package-key": "Sitegeist.CsvPO"
-        }
+        },
+        "applied-flow-migrations": [
+            "Neos.Twitter.Bootstrap-20161124204912"
+        ]
     }
 }
