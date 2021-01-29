@@ -3,6 +3,7 @@ namespace Sitegeist\CsvPO\Controller;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\I18n\Locale;
+use Neos\Flow\Security\Exception\AccessDeniedException;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\I18n\Service as LocalizationService;
@@ -26,6 +27,12 @@ class TranslationController extends AbstractModuleController
     protected $localizationService;
 
     /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="management.enabled")
+     */
+    protected $managementEnabled;
+
+    /**
      * @var array
      * @Flow\InjectConfiguration(path="management.locales")
      */
@@ -42,6 +49,14 @@ class TranslationController extends AbstractModuleController
      * @Flow\Inject
      */
     protected $translationOverrideRepository;
+
+    public function initializeAction()
+    {
+        if (!$this->managementEnabled) {
+            throw new AccessDeniedException("Translation management is disabled");
+        }
+        parent::initializeAction();
+    }
 
     public function indexAction()
     {

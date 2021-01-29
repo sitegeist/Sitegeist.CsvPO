@@ -1,0 +1,4 @@
+Sitegeist:
+  CsvPO:
+    management:
+      enabled: false
