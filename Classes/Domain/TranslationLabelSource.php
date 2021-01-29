@@ -26,6 +26,12 @@ class TranslationLabelSource
     protected $translationCache;
 
     /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="management.enabled")
+     */
+    protected $managementEnabled;
+
+    /**
      * @var array
      * @Flow\InjectConfiguration(path="management.fileExtension")
      */
@@ -58,7 +64,7 @@ class TranslationLabelSource
         } else {
             $translationData = [
                 'translations' => $this->readCsvData($this->identifier),
-                'overrides' => $this->readOverrideData($this->identifier)
+                'overrides' => $this->managementEnabled ? $this->readOverrideData($this->identifier) : []
             ];
             $this->translationCache->set($cacheIdentifier, $translationData);
         }

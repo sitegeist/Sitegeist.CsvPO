@@ -131,7 +131,7 @@ CvsPO comes with several cli commands
 ## Configuration
 
 The following configurations allow to control the behavior of the package 
-and the provided manangement options.
+and the provided management options.
 
 ```yaml
 Sitegeist:
@@ -144,6 +144,9 @@ Sitegeist:
     # Control which translation options are available in
     # the backend module and the cli
     management:
+      # enable locallization overrides, disables in contexts
+      # without database like visual regression testing
+      enabled: true    
 
       # package keys to scan for translation files
       packageKeys: []
