@@ -63,7 +63,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         if (strpos($translationIdentifier, 'get') === 0) {
             $translationIdentifier = lcfirst(substr($translationIdentifier, 3));
         }
-        return $this->translate($translationIdentifier, $arguments);
+        return $this->getTranslationForIdentifier($translationIdentifier, $arguments);
     }
 
     /**
@@ -73,7 +73,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function translate(string $translationIdentifier , array $arguments)
+    public function getTranslationForIdentifier(string $translationIdentifier , array $arguments)
     {
         $localizationFallbackChain = $this->getCurrentLocalizationFallbackChain();
 
