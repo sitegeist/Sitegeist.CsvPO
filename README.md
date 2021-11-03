@@ -126,7 +126,7 @@ CvsPO comes with several cli commands
 - `csvpo:bake` Bake the translations of the specified source back to the csv file
 - `csvpo:bakeAll` Bake the overrides all source back to the csv files
 - `csvpo:reset` Reset translation overrides of the specified source
-- `csvpo:bakeAll` Bake translation overrides of all sources
+- ` csvpo:resetall` Reset translation overrides of all sources
 
 ## Configuration
 
