@@ -31,12 +31,12 @@ Neos:
 
   Neos:
     modules:
-      administration:
+      management:
         submodules:
           translation:
             label: 'Translations'
             description: 'Show and alter component translations'
-            icon: 'language'
+            icon: 'icon-language'
             controller: 'Sitegeist\CsvPO\Controller\TranslationController'
             privilegeTarget: 'Sitegeist.CsvPO:ManageTranslationLabels'
 
