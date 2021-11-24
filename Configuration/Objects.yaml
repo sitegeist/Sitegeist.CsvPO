@@ -7,3 +7,7 @@
         arguments:
           1:
             value: Sitegeist_CsvPO_TranslationCache
+'Neos\Flow\I18n\Translator':
+  properties:
+    translationProvider:
+      object: 'Sitegeist\CsvPO\TranslationProvider\XliffAndCsvAwareTranslationProvider'
