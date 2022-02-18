@@ -34,6 +34,7 @@ class TranslationOverride
 
     /**
      * @var string
+     * @ORM\Column(name="translation", type="text")
      */
     protected $translation;
 
