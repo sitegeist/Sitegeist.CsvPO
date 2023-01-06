@@ -16,8 +16,9 @@ class TranslationHelper implements ProtectedContextAwareInterface
 
     /**
      * @param string $csvFile
+     * @return TranslationSourceConnector
      */
-    public function create(string $csvFile)
+    public function create(string $csvFile): TranslationSourceConnector
     {
         try {
             $translationSource = $this->translationSourceRepository->findOneByIdentifier($csvFile);

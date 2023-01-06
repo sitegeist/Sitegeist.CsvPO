@@ -61,7 +61,15 @@ class TranslationController extends AbstractModuleController
     public function indexAction()
     {
         $translationLabelSources = $this->translationLabelSourceRepository->findAll();
+        $translationLabelSourcesGroupedByPackageKey = [];
+        foreach ($translationLabelSources as $translationLabelSource) {
+            if (!array_key_exists($translationLabelSource->getPackageKey(), $translationLabelSourcesGroupedByPackageKey)) {
+                $translationLabelSourcesGroupedByPackageKey[$translationLabelSource->getPackageKey()] = [];
+            }
+            $translationLabelSourcesGroupedByPackageKey[$translationLabelSource->getPackageKey()][] = $translationLabelSource;
+        }
         $this->view->assign('translationLabelSources', $translationLabelSources);
+        $this->view->assign('translationLabelSourcesGroupedByPackageKey', $translationLabelSourcesGroupedByPackageKey);
     }
 
     public function showAction(string $sourceIdentifier)

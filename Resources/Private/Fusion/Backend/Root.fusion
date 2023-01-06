@@ -1,0 +1,8 @@
+include: resource://Neos.Fusion/Private/Fusion/Root.fusion
+include: resource://Neos.Fusion.Form/Private/Fusion/Root.fusion
+include: **/*.fusion
+
+Sitegeist.CsvPO.TranslationController.index = Sitegeist.CsvPO:Views.Index
+Sitegeist.CsvPO.TranslationController.show = Sitegeist.CsvPO:Views.Show
+Sitegeist.CsvPO.TranslationController.newOverride = Sitegeist.CsvPO:Views.NewOverride
+Sitegeist.CsvPO.TranslationController.updateOverride = Sitegeist.CsvPO:Views.UpdateOverride

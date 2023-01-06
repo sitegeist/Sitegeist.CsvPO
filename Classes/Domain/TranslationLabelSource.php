@@ -122,6 +122,35 @@ class TranslationLabelSource
     }
 
     /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return basename($this->identifier);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPackageKey(): string
+    {
+        $path = str_replace("resource://", '', $this->identifier);
+        $parts = explode('/', $path);
+        return (string) array_shift($parts);
+    }
+
+    /**
+     * @return string
+     */
+    public function getResourcePath(): string
+    {
+        $path = str_replace("resource://", '', $this->identifier);
+        $parts = explode('/', $path);
+        array_shift($parts);
+        return implode("/", $parts);
+    }
+
+    /**
      * @return array
      */
     protected function readCsvData (): array

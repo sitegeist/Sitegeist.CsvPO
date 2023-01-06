@@ -1,6 +1,7 @@
 <?php
 namespace Sitegeist\CsvPO\Eel;
 
+use _PHPStan_76800bfb5\Nette\NotImplementedException;
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\Locale;
@@ -9,7 +10,7 @@ use Neos\Flow\I18n\Service as LocalizationService;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Service\TranslationService;
 
-class TranslationSourceConnector implements ProtectedContextAwareInterface, \JsonSerializable
+class TranslationSourceConnector implements ProtectedContextAwareInterface, \JsonSerializable, \ArrayAccess
 {
 
     /**
@@ -58,7 +59,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function __call(string $translationIdentifier , array $arguments)
+    public function __call(string $translationIdentifier , array $arguments = []): string
     {
         if (strpos($translationIdentifier, 'get') === 0) {
             $translationIdentifier = lcfirst(substr($translationIdentifier, 3));
@@ -73,7 +74,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function getTranslationForIdentifier(string $translationIdentifier , array $arguments)
+    public function getTranslationForIdentifier(string $translationIdentifier , array $arguments = []): string
     {
         $localizationFallbackChain = $this->getCurrentLocalizationFallbackChain();
 
@@ -109,6 +110,34 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
             $this->localizationFallbackChainCach[$localeIdentifierString] = $localizationFallbackChain;
         }
         return $localizationFallbackChain;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        if (is_string($offset)) {
+            return $this->getTranslationForIdentifier($offset) ? true : false;
+        } else {
+            throw new \Exception("only strings are allowed as translation identifiers");
+        }
+    }
+
+    public function offsetGet(mixed $offset): string
+    {
+        if (is_string($offset)) {
+            return $this->getTranslationForIdentifier($offset);
+        } else {
+            throw new \Exception("only strings are allowed as translation identifiers");
+        }
+    }
+
+    public function offsetSet(mixed $offset, mixed $value)
+    {
+        throw new \Exception("not implemented");
+    }
+
+    public function offsetUnset(mixed $offset)
+    {
+        throw new \Exception("not implemented");
     }
 
     /**
