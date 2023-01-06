@@ -1,0 +1,35 @@
+prototype(Sitegeist.CsvPO:Views.NewOverride) < prototype(Neos.Fusion:Component) {
+    renderer = afx`
+        <legend>Create override for translation of "{translationOverride.labelIdentifier}" in {source.name}</legend>
+        <p>{source.identifier}</p><br/>
+
+        <Neos.Fusion.Form:Form
+            form.target.action="addOverride"
+            form.data.translationOverride={translationOverride}
+        >
+            <Neos.Fusion.Form:Hidden field.name="translationOverride[sourceIdentifier]" />
+            <Neos.Fusion.Form:Hidden field.name="translationOverride[labelIdentifier]" />
+            <Neos.Fusion.Form:Hidden field.name="translationOverride[localeIdentifier]" />
+
+            <div class="neos-control-group">
+                <label class="neos-control-label" for="translation">Original translation</label>
+                <div class="neos-controls neos-controls-row">
+                    <Neos.Fusion.Form:Input attributes.value={translation.translation} attributes.class="neos-span12" attributes.readonly />
+                </div>
+            </div>
+
+            <div class="neos-control-group">
+                <label class="neos-control-label" for="translation">Translation</label>
+                <div class="neos-controls neos-controls-row">
+                    <Neos.Fusion.Form:Textarea field.name="translationOverride[translation]" attributes.class="neos-span12" />
+                </div>
+            </div>
+
+            <div class="neos-footer">
+                <Neos.Fusion:Link.Action href.action="show" class="neos-button" href.arguments.sourceIdentifier={source.identifier}>Back</Neos.Fusion:Link.Action>
+                <Neos.Fusion.Form:Button attributes.class="neos-button neos-button-primary">Add Override</Neos.Fusion.Form:Button>
+            </div>
+
+        </Neos.Fusion.Form:Form>
+    `
+}

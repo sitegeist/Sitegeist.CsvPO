@@ -1,0 +1,27 @@
+prototype(Sitegeist.CsvPO:Views.Index) < prototype(Neos.Fusion:Component) {
+    renderer = afx`
+        <legend>Available translation sources</legend>
+        <Neos.Fusion:Loop items={translationLabelSourcesGroupedByPackageKey} itemName="translationLabelSources" itemKey="packageKey">
+            <table class="neos-table">
+                <thead>
+                <tr>
+                    <th>{packageKey}</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <Neos.Fusion:Loop items={translationLabelSources} itemName="source">
+                    <tr>
+                        <td>{source.resourcePath}</td>
+                        <td class="neos-priority1 neos-aCenter">
+                            <Neos.Fusion:Link.Action href.action="show"  href.arguments.sourceIdentifier={source.identifier}>
+                                <i class="fas fa-pencil-alt icon-white"></i>
+                            </Neos.Fusion:Link.Action>
+                        </td>
+                    </tr>
+                    </Neos.Fusion:Loop>
+                </tbody>
+            </table>
+        </Neos.Fusion:Loop>
+
+    `
+}

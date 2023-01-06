@@ -45,6 +45,7 @@ prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
     renderer = afx`
         <div>
             {props.i18n.title} <br/>
+            {props.i18n["subtitle"]} <br/>
             {props.i18n.text({info:'foo'})}<br/>
             {props.i18n.missing}
         </div>
@@ -52,11 +53,10 @@ prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
 }
 ```
 
-Global translations can be extracted into a component to be used across the project:
+Global translations can be extracted into a prototype to be used across the whole project:
 ```
-prototype(Vendor.Site:GlobalTranslations) < prototype(Neos.Fusion:Component) {
-    renderer = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Globals.translation.csv')}
-
+prototype(Vendor.Site:GlobalTranslations) < prototype(Neos.Fusion:Value) {
+    value = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Globals.translation.csv')}
 }
 
 prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {

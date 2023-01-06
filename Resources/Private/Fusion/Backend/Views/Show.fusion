@@ -1,0 +1,66 @@
+prototype(Sitegeist.CsvPO:Views.Show) < prototype(Neos.Fusion:Component) {
+    renderer = afx`
+        <div class="neos-row-fluid">
+            <legend>{source.packageKey}: {source.resourcePath}</legend>
+            <p>{source.identifier}</p>
+            <table class="neos-table">
+                <thead>
+                <tr>
+                    <td></td>
+                    <Neos.Fusion:Loop items={locales} itemName="locale">
+                        <th colspan="2"><strong>{locale}</strong></th>
+                    </Neos.Fusion:Loop>
+                </tr>
+                </thead>
+                <tbody>
+                <Neos.Fusion:Loop items={translationsByLocale} itemKey="translationIdentifier" itemName="labelInformations">
+                    <tr>
+                        <td style="line-height: 1.5em; padding: 1em;">
+                            <div>
+                                <strong>{labelInformations.identifier}</strong>
+                            </div>
+                            <div @if={labelInformations.description} style="font-style: italic; color: grey; padding-top: .5em;">
+                                {labelInformations.description}
+                            </div>
+                        </td>
+                        <Neos.Fusion:Loop items={labelInformations.translations} itemKey="localeIdentifier" itemName="translationInLocale">
+                            <td style="line-height: 1.5em; padding: 1em; border-left: 1px solid #222;">
+                                <div>
+                                    {String.htmlSpecialChars(translationInLocale)}
+                                </div>
+                                <div @if={translationInLocale.override || translationInLocale.fallback}
+                                     style="font-style: italic; color: grey; padding-top: .5em;"
+                                >
+                                    <strike @if={translationInLocale.override}>{translationInLocale.translation}</strike><br/>
+                                    <span @if={translationInLocale.fallback}>fallback from: {translationInLocale.fallbackLocaleIdentifier}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <Neos.Fusion:Link.Action  @if={translationInLocale.override}
+                                    href.action="updateOverride"
+                                    href.arguments.sourceIdentifier={source.identifier}
+                                    href.arguments.labelIdentifier={translationIdentifier}
+                                    href.arguments.localeIdentifier={localeIdentifier}
+                                    >
+                                    <i class="fas fa-pencil-alt icon-white"></i>
+                                </Neos.Fusion:Link.Action>
+                                <Neos.Fusion:Link.Action
+                                    @if={!translationInLocale.override}
+                                    href.action="newOverride"
+                                    href.arguments.sourceIdentifier={source.identifier}
+                                    href.arguments.labelIdentifier={translationIdentifier}
+                                    href.arguments.localeIdentifier={localeIdentifier}
+                                    >
+                                    <i class="fas fa-plus icon-white"></i>
+                                </Neos.Fusion:Link.Action>
+                            </td>
+                        </Neos.Fusion:Loop>
+                    </tr>
+                </Neos.Fusion:Loop>
+                </tbody>
+            </table>
+        </div>
+
+
+    `
+}

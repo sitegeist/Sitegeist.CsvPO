@@ -1,0 +1,6 @@
+-
+  requestFilter: 'isPackage("Sitegeist.CsvPO") && isController("Translation")'
+  viewObjectName: 'Neos\Fusion\View\FusionView'
+  options:
+    fusionPathPatterns:
+      - 'resource://Sitegeist.CsvPo/Private/Fusion/Backend'
