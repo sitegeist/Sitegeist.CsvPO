@@ -112,7 +112,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         return $localizationFallbackChain;
     }
 
-    public function offsetExists(mixed $offset): bool
+    public function offsetExists($offset)
     {
         if (is_string($offset)) {
             return $this->getTranslationForIdentifier($offset) ? true : false;
@@ -121,7 +121,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         }
     }
 
-    public function offsetGet(mixed $offset): string
+    public function offsetGet($offset)
     {
         if (is_string($offset)) {
             return $this->getTranslationForIdentifier($offset);
@@ -130,12 +130,12 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         }
     }
 
-    public function offsetSet(mixed $offset, mixed $value)
+    public function offsetSet($offset, $value)
     {
         throw new \Exception("not implemented");
     }
 
-    public function offsetUnset(mixed $offset)
+    public function offsetUnset($offset)
     {
         throw new \Exception("not implemented");
     }
