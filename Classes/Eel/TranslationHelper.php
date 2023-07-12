@@ -23,7 +23,7 @@ class TranslationHelper implements ProtectedContextAwareInterface
         } elseif (count($csvFiles) === 1) {
             $translationSource = $this->translationSourceRepository->findOneByIdentifier($csvFiles[0]);
             if ($translationSource) {
-                return new Translations($translationSource);
+                return new TranslationSourceConnector($translationSource);
             }
             throw new TranslationLabelSourceNotFoundException(sprintf('Translation source %s was not found', $csvFiles[0]));
         }
