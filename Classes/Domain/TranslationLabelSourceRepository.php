@@ -17,40 +17,35 @@ class TranslationLabelSourceRepository
     protected $packageManager;
 
     /**
-     * @var array
+     * @var string[]
      * @Flow\InjectConfiguration(path="management.packageKeys")
      */
     protected $packageKeys;
 
     /**
-     * @var array
+     * @var string
      * @Flow\InjectConfiguration(path="management.fileExtension")
      */
     protected $fileExtension;
 
     /**
-     * @var array
+     * @var string
      * @Flow\InjectConfiguration(path="management.resourcePath")
      */
     protected $resourcePath;
 
     /**
-     * @var array
+     * @var string[]
      * @Flow\InjectConfiguration(path="management.locales")
      */
     protected $locales;
 
-    /**
-     * @param $identifier
-     * @return TranslationLabelSource|null
-     * @throws TranslationLabelSourceNotFoundException
-     */
-    public function findOneByIdentifier($identifier): ?TranslationLabelSource
+    public function findOneByIdentifier(string $identifier): ?TranslationLabelSource
     {
         if (file_exists($identifier) && is_file($identifier)) {
             return new TranslationLabelSource($identifier);
         } else {
-            throw new TranslationLabelSourceNotFoundException(sprintf('Translation source %s was not found', $identifier));
+            return null;
         }
     }
 
@@ -71,11 +66,11 @@ class TranslationLabelSourceRepository
             }
         }
 
-        return array_map(
+        return array_filter(array_map(
             function ($translationIdentifier) {
                 return $this->findOneByIdentifier($translationIdentifier);
             },
             $translationIdentifiers
-        );
+        ));
     }
 }

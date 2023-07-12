@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sitegeist\CsvPO\Eel;
 
-use _PHPStan_76800bfb5\Nette\NotImplementedException;
 use Neos\Flow\Annotations as Flow;
-use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\FormatResolver;
 use Neos\Flow\I18n\Service as LocalizationService;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
-use Sitegeist\CsvPO\Service\TranslationService;
 
-class TranslationSourceConnector implements ProtectedContextAwareInterface, \JsonSerializable, \ArrayAccess
+class TranslationSourceConnector implements TranslationsInterface
 {
     /**
      * @var LocalizationService
@@ -31,12 +30,12 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
     protected $formatResolver;
 
     /**
-     * @var Locale[]
+     * @var array<string, Locale[]>
      */
     protected $localizationFallbackChainCache = [];
 
     /**
-     * @var TranslationLabelSource
+     * @var bool
      * @Flow\InjectConfiguration(path="debugMode")
      */
     protected $debugMode;
@@ -44,8 +43,6 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
     /**
      * TranslationSourceConnector constructor.
      * @param TranslationLabelSource $translationSource
-     * @param string $localeIdentifier
-     * @param array $localizationFallbackChain
      */
     public function __construct(TranslationLabelSource $translationSource)
     {
@@ -53,11 +50,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
     }
 
     /**
-     * @param string $translationIdentifier
-     * @param array $arguments
-     * @return string
-     * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
-     * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
+     * @param array<string|int, mixed> $arguments
      */
     public function __call(string $translationIdentifier, array $arguments = []): string
     {
@@ -68,11 +61,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
     }
 
     /**
-     * @param string $translationIdentifier
-     * @param array $arguments
-     * @return string
-     * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
-     * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
+     * @param array<string|int, mixed> $arguments
      */
     public function getTranslationForIdentifier(string $translationIdentifier, array $arguments = []): string
     {
@@ -85,17 +74,18 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
             } else {
                 $translationResult = $translation->__toString();
             }
-            if (empty($translationResult) && $this->debugMode) {
+            if (!empty($translationResult)) {
+                return $translationResult;
+            } else {
                 return $this->debugMode ? '-- i18n-translate ' . $translationIdentifier . ' --' : $translationIdentifier;
             }
-            return $translationResult;
         } else {
             return $this->debugMode ? '-- i18n-add ' . $translationIdentifier . ' --' : $translationIdentifier;
         }
     }
 
     /**
-     * @return array
+     * @return Locale[]
      */
     protected function getCurrentLocalizationFallbackChain(): array
     {
@@ -104,15 +94,15 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
 
         // determine the fallback chain and cache the result for the current locale
         if (array_key_exists($localeIdentifierString, $this->localizationFallbackChainCache)) {
-            $localizationFallbackChain = $this->localizationFallbackChainCach[$localeIdentifierString];
+            $localizationFallbackChain = $this->localizationFallbackChainCache[$localeIdentifierString];
         } else {
             $localizationFallbackChain = $this->localisationService->getLocaleChain($localeIdentifier);
-            $this->localizationFallbackChainCach[$localeIdentifierString] = $localizationFallbackChain;
+            $this->localizationFallbackChainCache[$localeIdentifierString] = $localizationFallbackChain;
         }
         return $localizationFallbackChain;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         if (is_string($offset)) {
             return $this->getTranslationForIdentifier($offset) ? true : false;
@@ -121,7 +111,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         }
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): string
     {
         if (is_string($offset)) {
             return $this->getTranslationForIdentifier($offset);
@@ -130,18 +120,18 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         }
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new \Exception("not implemented");
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \Exception("not implemented");
     }
 
     /**
-     * @inheritDoc
+     * @return array<string,string>
      */
     public function jsonSerialize(): array
     {

@@ -23,7 +23,7 @@ class Package extends BasePackage
 
         $context = $bootstrap->getContext();
         if (!$context->isProduction()) {
-            $dispatcher->connect(Sequence::class, 'afterInvokeStep', function ($step) use ($bootstrap, $dispatcher) {
+            $dispatcher->connect(Sequence::class, 'afterInvokeStep', function ($step) use ($bootstrap) {
                 if ($step->getIdentifier() === 'neos.flow:systemfilemonitor') {
                     $templateFileMonitor = FileMonitor::createFileMonitorAtBoot('Sitegeist_Translation_Csv_Files', $bootstrap);
                     /**
@@ -51,7 +51,11 @@ class Package extends BasePackage
                 return;
             }
 
-            $templateCache = $bootstrap->getObjectManager()->get(CacheManager::class)->getCache('Sitegeist_CsvPO_TranslationCache');
+            /**
+             * @var CacheManager $cacheManager
+             */
+            $cacheManager = $bootstrap->getObjectManager()->get(CacheManager::class);
+            $templateCache = $cacheManager->getCache('Sitegeist_CsvPO_TranslationCache');
             $templateCache->flush();
         };
 

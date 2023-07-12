@@ -33,13 +33,13 @@ class TranslationLabelSource
     protected $managementEnabled;
 
     /**
-     * @var array
+     * @var string
      * @Flow\InjectConfiguration(path="management.fileExtension")
      */
     protected $fileExtension;
 
     /**
-     * @var array
+     * @var string
      * @Flow\InjectConfiguration(path="management.resourcePath")
      */
     protected $resourcePath;
@@ -53,10 +53,9 @@ class TranslationLabelSource
     public function __construct(string $identifier)
     {
         $this->identifier = $identifier;
-        $this->Persistence_Object_Identifier = $identifier;
     }
 
-    protected function initializeObject()
+    protected function initializeObject(): void
     {
 
         // read data from csv and overrides
@@ -65,14 +64,15 @@ class TranslationLabelSource
             $translationData = $this->translationCache->get($cacheIdentifier);
         } else {
             $translationData = [
-                'translations' => $this->readCsvData($this->identifier),
-                'overrides' => $this->managementEnabled ? $this->readOverrideData($this->identifier) : []
+                'translations' => $this->readCsvData(),
+                'overrides' => $this->managementEnabled ? $this->readOverrideData() : []
             ];
             $this->translationCache->set($cacheIdentifier, $translationData);
         }
 
         // instantiate the translation objects
         foreach (array_keys($translationData['translations']) as $labelIdentifier) {
+            $labelIdentifier = (string) $labelIdentifier;
             $this->translations[$labelIdentifier] = new TranslationLabel(
                 $labelIdentifier,
                 $translationData['translations'][$labelIdentifier]['description'] ?? '',
@@ -153,7 +153,7 @@ class TranslationLabelSource
     }
 
     /**
-     * @return array
+     * @return array<string, array<string, string|null>>
      */
     protected function readCsvData(): array
     {
@@ -162,7 +162,11 @@ class TranslationLabelSource
         $csv->setHeaderOffset(0);
         $header = $csv->getHeader();
 
-        foreach ($csv->getRecords() as $csvRecord) {
+        /**
+         * @var \Iterator<array<string|null>> $csvRecords
+         */
+        $csvRecords = $csv->getRecords();
+        foreach ($csvRecords as $csvRecord) {
             $identifier = $csvRecord[ $header[0] ];
             unset($csvRecord[$header[0]]);
             $translations[$identifier] = $csvRecord;
@@ -171,20 +175,20 @@ class TranslationLabelSource
     }
 
     /**
-     * @return array
+     * @return array<string, array<string, string>>
      */
     protected function readOverrideData(): array
     {
         $overrides = [];
         $queryResult = $this->translationOverrideRepository->findBySourceIdentifier($this->identifier);
-        foreach ($queryResult as $translationLabel) {
+        foreach ($queryResult as $translationOverride) {
             /**
-             * @var TranslationOverride $translationLabel
+             * @var TranslationOverride $translationOverride
              */
-            if (!array_key_exists($translationLabel->getLabelIdentifier(), $overrides)) {
-                $overrides[$translationLabel->getLabelIdentifier()] = [];
+            if (!array_key_exists($translationOverride->getLabelIdentifier(), $overrides)) {
+                $overrides[$translationOverride->getLabelIdentifier()] = [];
             }
-            $overrides[$translationLabel->getLabelIdentifier()][$translationLabel->getLocaleIdentifier()] = $translationLabel->getTranslation();
+            $overrides[$translationOverride->getLabelIdentifier()][$translationOverride->getLocaleIdentifier()] = $translationOverride->getTranslation();
         }
         return $overrides;
     }

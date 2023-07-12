@@ -29,7 +29,7 @@ class CsvPoCommandController extends CommandController
     protected $translationLabelSourceRepository;
 
     /**
-     * @var array
+     * @var string[]
      * @Flow\InjectConfiguration(path="management.locales")
      */
     protected $locales;
@@ -43,7 +43,7 @@ class CsvPoCommandController extends CommandController
     /**
      * Show a list of all translation sources
      */
-    public function listCommand()
+    public function listCommand(): void
     {
         $allSources = $this->translationLabelSourceRepository->findAll();
         $rows = [];
@@ -58,7 +58,7 @@ class CsvPoCommandController extends CommandController
      *
      * @param $identifier the identifier to show (globbing is supported)
      */
-    public function showAllCommand(string $identifier = null)
+    public function showAllCommand(string $identifier = null): void
     {
         $allSources = $this->translationLabelSourceRepository->findAll();
         foreach ($allSources as $source) {
@@ -80,7 +80,7 @@ class CsvPoCommandController extends CommandController
      *
      * @param $identifier the identifier to show (globbing is supported)
      */
-    public function showCommand(string $identifier)
+    public function showCommand(string $identifier): void
     {
         $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
         if ($source) {
@@ -97,7 +97,7 @@ class CsvPoCommandController extends CommandController
      * Bake the all translation overrides to the csv files
      *
      */
-    public function bakeAllCommand()
+    public function bakeAllCommand(): void
     {
         $allSources = $this->translationLabelSourceRepository->findAll();
         foreach ($allSources as $source) {
@@ -110,18 +110,18 @@ class CsvPoCommandController extends CommandController
      *
      * @param string $identifier the translation csv that shall be updated
      */
-    public function bakeCommand(string $identifier)
+    public function bakeCommand(string $identifier): void
     {
         $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
-        $this->bakeSource($source);
+        if ($source) {
+            $this->bakeSource($source);
+        }
     }
 
     /**
      * Reset all overrides
-     *
-     * @param string $identifier
      */
-    public function resetAllCommand(bool $yes = false)
+    public function resetAllCommand(bool $yes = false): void
     {
         if (!$yes) {
             $confirmation = $this->output->askConfirmation('Are you sure', false);
@@ -137,11 +137,9 @@ class CsvPoCommandController extends CommandController
     }
 
     /**
-     * Reset all overrices for the specified to the csv file
-     *
-     * @param string $identifier
+     * Reset all overrides for the specified to the csv file*
      */
-    public function resetCommand(string $identifier, bool $yes = false)
+    public function resetCommand(string $identifier, bool $yes = false): void
     {
         if (!$yes) {
             $confirmation = $this->output->askConfirmation('Are you sure', false);
@@ -151,14 +149,12 @@ class CsvPoCommandController extends CommandController
         }
 
         $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
-        $this->resetSource($source);
+        if ($source) {
+            $this->resetSource($source);
+        }
     }
 
-    /**
-     * @param \Sitegeist\CsvPO\Domain\TranslationLabelSource $source
-     * @throws \Neos\Flow\I18n\Exception\InvalidLocaleIdentifierException
-     */
-    protected function renderSource(\Sitegeist\CsvPO\Domain\TranslationLabelSource $source): void
+    protected function renderSource(TranslationLabelSource $source): void
     {
         $this->output->outputLine($source->getTitle() . ' : ' . $source->getIdentifier());
 
@@ -184,11 +180,6 @@ class CsvPoCommandController extends CommandController
         $this->output->outputLine();
     }
 
-    /**
-     * @param TranslationLabelSource $source
-     * @throws \League\Csv\CannotInsertRecord
-     * @throws \Sitegeist\CsvPO\Exception\TranslationLabelSourceNotFoundException
-     */
     protected function bakeSource(TranslationLabelSource $source): void
     {
         $this->output->outputLine(sprintf('Bake %s : %s', $source->getTitle(), $source->getIdentifier()));
@@ -203,7 +194,7 @@ class CsvPoCommandController extends CommandController
 
         // update records
         /**
-         * @var $override TranslationOverride
+         * @var TranslationOverride $override
          */
         foreach ($overrides as $override) {
             // add missing locales to header
