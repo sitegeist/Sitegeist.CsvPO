@@ -37,36 +37,90 @@ the path to the translation csv file as argument. The returned object
 allows to access the translations in fusion and afx. 
 
 Example.fusion
-```
+```neosfusion
 prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
 
-    i18n = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Example.translation.csv')}
+    @private.i18n = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Example.translation.csv')}
 
     renderer = afx`
         <div>
-            {props.i18n.title} <br/>
-            {props.i18n["subtitle"]} <br/>
-            {props.i18n.text({info:'foo'})}<br/>
-            {props.i18n.missing}
+            {private.i18n.title} <br/>
+            {private.i18n["subtitle"]} <br/>
+            {private.i18n.text({info:'foo'})}<br/>
+            {private.i18n.missing}s
         </div>
     `
 }
 ```
 
-Global translations can be extracted into a prototype to be used across the whole project:
+## Chain translations and optional overrides 
+
+When multiple csv files are given the labels from files at the end of the chain take precedence.
+
+```neosfusion
+prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
+    i18n = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/TranslationChainExample/Generic.translation.csv', 'resource://Vendor.Site/Private/Fusion/TranslationChainExample/Override.translation.csv')}
+}
 ```
-prototype(Vendor.Site:GlobalTranslations) < prototype(Neos.Fusion:Value) {
+
+Combined with the `@private` syntax from fusion in Neos 8.3 this allows to specify generic translations and allow to 
+optionally pass translation-files that will take precedence.
+
+```neosfusion
+prototype(Vendor.Package:TranslationChainExample) < prototype(Neos.Fusion:Component) {
+
+    # can be set from outside and is recommended to be null by default
+    i18nOverride = 'resource://Vendor.Package/Private/Fusion/TranslationChainExample/Override.translation.csv'
+
+    # combines a predefined translation with one that os passed as props.
+    @private {
+        i18n = ${CsvPO.create('resource://Vendor.Package/Private/Fusion/TranslationChainExample/Generic.translation.csv', props.i18nOverride)}
+    }
+
+    renderer = afx`
+        <!-- access single translation -->
+        <div>{private.i18n.example}</div>
+
+        <!-- export all translations as json -->
+        <div data-translations={Json.stringify(private.i18n.jsonSerialize())}></div>
+    `
+}
+```
+### Placeholders 
+
+CSVPO supports the same syntax for placeholders as the classic xliff translations of Flow. 
+See: https://flowframework.readthedocs.io/en/stable/TheDefinitiveGuide/PartIII/Internationalization.html?highlight=translations#placeholders 
+
+```neosfusion
+    # customize translation with params
+    example1 = ${private.i18n.example('hello', 'world')}
+    
+    # placeholders can also be passed as array 
+    example2 = ${private.i18n.example(['hello', 'world'])}
+    
+    # or as named data-structure
+    example3 = ${private.i18n.example({title:"hello"})}
+```
+
+### Global translations
+
+Global translations can be extracted into a prototype to be used across the whole project. It is recommended to 
+use the `Neos.Fusion:Memo` as base prototype to only evaluate the prototype once.
+
+```neosfusion
+prototype(Vendor.Site:GlobalTranslations) < prototype(Neos.Fusion:Memo) {
+    discriminator = 'Vendor.Site:GlobalTranslations'
     value = ${CsvPO.create('resource://Vendor.Site/Private/Fusion/Presentation/Globals.translation.csv')}
 }
 
 prototype(Vendor.Site:Example) < prototype(Neos.Fusion:Component) {
 
-    i18n = Vendor.Site:GlobalTranslations
+    @private.i18n = Vendor.Site:GlobalTranslations
 
     renderer = afx`
         <div>
-            {props.i18n.title} <br/>
-            {props.i18n.text({info:'foo'})}<br/>
+            {private.i18n.title} <br/>
+            {private.i18n.text({info:'foo'})}<br/>
         </div>
     `
 }
@@ -126,7 +180,7 @@ CvsPO comes with several cli commands
 - `csvpo:bake` Bake the translations of the specified source back to the csv file
 - `csvpo:bakeAll` Bake the overrides all source back to the csv files
 - `csvpo:reset` Reset translation overrides of the specified source
-- ` csvpo:resetall` Reset translation overrides of all sources
+- `csvpo:resetall` Reset translation overrides of all sources
 
 ## Configuration
 

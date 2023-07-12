@@ -61,7 +61,7 @@ class TranslationLabel
     /**
      * @param Locale[] $localeChain
      */
-    public function findTranslationForLocaleChain(array $localeChain): Translation
+    public function findTranslationForLocaleChain(array $localeChain): ?Translation
     {
         // current locale Identifier
         $localeIdentifier = array_keys($localeChain)[0];
@@ -83,7 +83,6 @@ class TranslationLabel
             }
         }
 
-        // final fallback return empty
-        return new Translation();
+        return null;
     }
 }
