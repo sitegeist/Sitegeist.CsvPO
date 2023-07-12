@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Eel;
 
 use Neos\Flow\Annotations as Flow;
@@ -36,5 +37,4 @@ class TranslationHelper implements ProtectedContextAwareInterface
     {
         return $methodName == 'create';
     }
-
 }

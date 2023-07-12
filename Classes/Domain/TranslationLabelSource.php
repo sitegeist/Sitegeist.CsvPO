@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;
@@ -55,7 +56,8 @@ class TranslationLabelSource
         $this->Persistence_Object_Identifier = $identifier;
     }
 
-    protected function initializeObject() {
+    protected function initializeObject()
+    {
 
         // read data from csv and overrides
         $cacheIdentifier = md5($this->identifier);
@@ -116,7 +118,7 @@ class TranslationLabelSource
     {
         $title = $this->identifier;
         $title = str_replace("resource://", '', $title);
-        $title = str_replace( '/' . $this->resourcePath . '/', ' - ', $title);
+        $title = str_replace('/' . $this->resourcePath . '/', ' - ', $title);
         $title = str_replace($this->fileExtension, '', $title);
         return $title;
     }
@@ -153,7 +155,7 @@ class TranslationLabelSource
     /**
      * @return array
      */
-    protected function readCsvData (): array
+    protected function readCsvData(): array
     {
         $translations = [];
         $csv = Reader::createFromPath($this->identifier, 'r');
@@ -171,7 +173,7 @@ class TranslationLabelSource
     /**
      * @return array
      */
-    protected function readOverrideData (): array
+    protected function readOverrideData(): array
     {
         $overrides = [];
         $queryResult = $this->translationOverrideRepository->findBySourceIdentifier($this->identifier);
@@ -190,10 +192,10 @@ class TranslationLabelSource
     /**
      * Flush the caches of this translation source
      */
-    public function flushCaches (): void
+    public function flushCaches(): void
     {
         $cacheIdentifier = md5($this->identifier);
-        if  ($this->translationCache->has($cacheIdentifier)) {
+        if ($this->translationCache->has($cacheIdentifier)) {
             $this->translationCache->remove($cacheIdentifier);
         }
     }

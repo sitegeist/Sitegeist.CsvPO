@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Controller;
 
 use Neos\Flow\Annotations as Flow;
@@ -10,7 +11,6 @@ use Neos\Flow\I18n\Service as LocalizationService;
 use Sitegeist\CsvPO\Domain\TranslationLabelSourceRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
-
 
 class TranslationController extends AbstractModuleController
 {
@@ -84,7 +84,7 @@ class TranslationController extends AbstractModuleController
                 'translations' => []
             ];
             foreach ($this->locales as $localeIdentifier) {
-                $localeChain = $this->localizationService->getLocaleChain( new Locale($localeIdentifier) );
+                $localeChain = $this->localizationService->getLocaleChain(new Locale($localeIdentifier));
                 $labelInformations['translations'][$localeIdentifier] = $translationLabel->findTranslationForLocaleChain($localeChain);
             }
             $translationsByLocale[$translationLabel->getIdentifier()] = $labelInformations;
@@ -100,8 +100,9 @@ class TranslationController extends AbstractModuleController
      * @param string $localeIdentifier
      * @param string $labelIdentifier
      */
-    public function newOverrideAction(string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier) {
-        $localeChain = $this->localizationService->getLocaleChain( new Locale($localeIdentifier) );
+    public function newOverrideAction(string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier)
+    {
+        $localeChain = $this->localizationService->getLocaleChain(new Locale($localeIdentifier));
 
         $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($sourceIdentifier);
         $label = $translationLabelSource->findTranslationLabelByIdentifier($labelIdentifier);
@@ -116,12 +117,13 @@ class TranslationController extends AbstractModuleController
         $this->view->assign('source', $translationLabelSource);
         $this->view->assign('translation', $translation);
         $this->view->assign('translationOverride', $translationOverride);
-   }
+    }
 
     /**
      * @param TranslationOverride $translationLabel
      */
-    public function addOverrideAction(TranslationOverride $translationOverride) {
+    public function addOverrideAction(TranslationOverride $translationOverride)
+    {
         $this->translationOverrideRepository->add($translationOverride);
 
         $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($translationOverride->getSourceIdentifier());
@@ -133,10 +135,10 @@ class TranslationController extends AbstractModuleController
     /**
      * @param TranslationOverride $translationOverride
      */
-    public function updateOverrideAction( string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier )
+    public function updateOverrideAction(string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier)
     {
         $translationOverride = $this->translationOverrideRepository->findOneSpecific($sourceIdentifier, $localeIdentifier, $labelIdentifier);
-        $localeChain = $this->localizationService->getLocaleChain( new Locale($translationOverride->getLocaleIdentifier()) );
+        $localeChain = $this->localizationService->getLocaleChain(new Locale($translationOverride->getLocaleIdentifier()));
 
         $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($translationOverride->getSourceIdentifier());
         $label = $translationLabelSource->findTranslationLabelByIdentifier($translationOverride->getLabelIdentifier());

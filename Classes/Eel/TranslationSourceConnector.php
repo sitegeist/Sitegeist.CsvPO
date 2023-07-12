@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Eel;
 
 use _PHPStan_76800bfb5\Nette\NotImplementedException;
@@ -12,7 +13,6 @@ use Sitegeist\CsvPO\Service\TranslationService;
 
 class TranslationSourceConnector implements ProtectedContextAwareInterface, \JsonSerializable, \ArrayAccess
 {
-
     /**
      * @var LocalizationService
      * @Flow\Inject
@@ -59,7 +59,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function __call(string $translationIdentifier , array $arguments = []): string
+    public function __call(string $translationIdentifier, array $arguments = []): string
     {
         if (strpos($translationIdentifier, 'get') === 0) {
             $translationIdentifier = lcfirst(substr($translationIdentifier, 3));
@@ -74,7 +74,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
      * @throws \Neos\Flow\I18n\Exception\IndexOutOfBoundsException
      * @throws \Neos\Flow\I18n\Exception\InvalidFormatPlaceholderException
      */
-    public function getTranslationForIdentifier(string $translationIdentifier , array $arguments = []): string
+    public function getTranslationForIdentifier(string $translationIdentifier, array $arguments = []): string
     {
         $localizationFallbackChain = $this->getCurrentLocalizationFallbackChain();
 

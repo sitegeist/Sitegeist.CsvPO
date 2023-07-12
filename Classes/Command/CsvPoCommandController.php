@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Command;
 
 use League\Csv\Reader;
@@ -42,7 +43,8 @@ class CsvPoCommandController extends CommandController
     /**
      * Show a list of all translation sources
      */
-    public function listCommand() {
+    public function listCommand()
+    {
         $allSources = $this->translationLabelSourceRepository->findAll();
         $rows = [];
         foreach ($allSources as $source) {
@@ -56,7 +58,8 @@ class CsvPoCommandController extends CommandController
      *
      * @param $identifier the identifier to show (globbing is supported)
      */
-    public function showAllCommand(string $identifier = null) {
+    public function showAllCommand(string $identifier = null)
+    {
         $allSources = $this->translationLabelSourceRepository->findAll();
         foreach ($allSources as $source) {
             $sourceIdentifier = $source->getIdentifier();
@@ -77,9 +80,10 @@ class CsvPoCommandController extends CommandController
      *
      * @param $identifier the identifier to show (globbing is supported)
      */
-    public function showCommand(string $identifier) {
+    public function showCommand(string $identifier)
+    {
         $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
-        if($source) {
+        if ($source) {
             $this->renderSource($source);
         }
 
@@ -93,7 +97,8 @@ class CsvPoCommandController extends CommandController
      * Bake the all translation overrides to the csv files
      *
      */
-    public function bakeAllCommand() {
+    public function bakeAllCommand()
+    {
         $allSources = $this->translationLabelSourceRepository->findAll();
         foreach ($allSources as $source) {
             $this->bakeSource($source);
@@ -105,7 +110,8 @@ class CsvPoCommandController extends CommandController
      *
      * @param string $identifier the translation csv that shall be updated
      */
-    public function bakeCommand(string $identifier) {
+    public function bakeCommand(string $identifier)
+    {
         $source = $this->translationLabelSourceRepository->findOneByIdentifier($identifier);
         $this->bakeSource($source);
     }
@@ -115,7 +121,8 @@ class CsvPoCommandController extends CommandController
      *
      * @param string $identifier
      */
-    public function resetAllCommand(bool $yes = false) {
+    public function resetAllCommand(bool $yes = false)
+    {
         if (!$yes) {
             $confirmation = $this->output->askConfirmation('Are you sure', false);
             if (!$confirmation) {
@@ -134,7 +141,8 @@ class CsvPoCommandController extends CommandController
      *
      * @param string $identifier
      */
-    public function resetCommand(string $identifier, bool  $yes = false) {
+    public function resetCommand(string $identifier, bool $yes = false)
+    {
         if (!$yes) {
             $confirmation = $this->output->askConfirmation('Are you sure', false);
             if (!$confirmation) {
@@ -162,7 +170,7 @@ class CsvPoCommandController extends CommandController
                 $translation = $translationLabel->findTranslationForLocaleChain($localeChain);
                 if ($translation->getOverride()) {
                     $text = '<info>O::' . $translation->getOverride() . '</info>';
-                } else if ($translation->getFallback()) {
+                } elseif ($translation->getFallback()) {
                     $text = '<comment>F::' . $translation->getFallback() . '</comment>';
                 } else {
                     $text = $translation->__toString();
@@ -215,7 +223,7 @@ class CsvPoCommandController extends CommandController
         // save records
         $csvWriter = Writer::createFromPath($source->getIdentifier(), 'w');
         $csvWriter->insertOne($header);
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $row = [];
             foreach ($header as $column) {
                 $row[$column] = $record[$column] ?? '';
@@ -238,7 +246,7 @@ class CsvPoCommandController extends CommandController
 
         // remove overrides
         $overrides = $this->translationOverrideRepository->findBySourceIdentifier($source->getIdentifier());
-        foreach($overrides as $override) {
+        foreach ($overrides as $override) {
             /**
              * @var TranslationOverride $override
              */

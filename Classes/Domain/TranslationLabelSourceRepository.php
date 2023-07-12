@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;
@@ -61,21 +62,20 @@ class TranslationLabelSourceRepository
         $translationIdentifiers = [];
         foreach ($this->packageKeys as $packageKey) {
             $package = $this->packageManager->getPackage($packageKey);
-            if($package instanceof FlowPackageInterface) {
+            if ($package instanceof FlowPackageInterface) {
                 $resourcesPath = $package->getResourcesPath();
                 $packageTranslationFiles = Files::readDirectoryRecursively($resourcesPath . $this->resourcePath, $this->fileExtension);
-                foreach($packageTranslationFiles as $packageTranslationFile) {
-                    $translationIdentifiers[] = str_replace($resourcesPath, 'resource://'. $packageKey . '/' , $packageTranslationFile);
+                foreach ($packageTranslationFiles as $packageTranslationFile) {
+                    $translationIdentifiers[] = str_replace($resourcesPath, 'resource://' . $packageKey . '/', $packageTranslationFile);
                 }
             }
         }
 
         return array_map(
-            function($translationIdentifier) {
+            function ($translationIdentifier) {
                 return $this->findOneByIdentifier($translationIdentifier);
             },
             $translationIdentifiers
         );
-
     }
 }

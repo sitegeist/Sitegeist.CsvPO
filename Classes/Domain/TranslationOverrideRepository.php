@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;
@@ -11,7 +12,7 @@ class TranslationOverrideRepository extends Repository
 {
     protected static $ENTITY_CLASSNAME = TranslationOverride::class;
 
-    public function findOneSpecific( string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier )
+    public function findOneSpecific(string $sourceIdentifier, string $localeIdentifier, string $labelIdentifier)
     {
         $query = $this->createQuery();
         return $query->matching(
@@ -22,5 +23,4 @@ class TranslationOverrideRepository extends Repository
             )
         )->execute()->getFirst();
     }
-
 }
