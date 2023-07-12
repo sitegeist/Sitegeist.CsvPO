@@ -7,7 +7,7 @@ namespace Sitegeist\CsvPO\Eel;
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 
-class Translations extends AbstractTranslations
+class TranslationSourceConnector extends AbstractTranslations
 {
     protected TranslationLabelSource $translationSource;
 
