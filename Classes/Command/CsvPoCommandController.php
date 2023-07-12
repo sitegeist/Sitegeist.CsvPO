@@ -164,12 +164,12 @@ class CsvPoCommandController extends CommandController
             foreach ($this->locales as $localeIdentifier) {
                 $localeChain = $this->localizationService->getLocaleChain(new Locale($localeIdentifier));
                 $translation = $translationLabel->findTranslationForLocaleChain($localeChain);
-                if ($translation->getOverride()) {
+                if ($translation?->getOverride()) {
                     $text = '<info>O::' . $translation->getOverride() . '</info>';
-                } elseif ($translation->getFallback()) {
+                } elseif ($translation?->getFallback()) {
                     $text = '<comment>F::' . $translation->getFallback() . '</comment>';
                 } else {
-                    $text = $translation->__toString();
+                    $text = $translation?->__toString() ?? '';
                 }
                 $row[] = $text;
             }

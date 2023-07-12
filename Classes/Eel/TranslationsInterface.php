@@ -12,11 +12,13 @@ use Neos\Eel\ProtectedContextAwareInterface;
 interface TranslationsInterface extends ProtectedContextAwareInterface, \JsonSerializable, \ArrayAccess
 {
     /**
+     * @param string $translationIdentifier
      * @param array<string|int, mixed> $arguments
      */
     public function __call(string $translationIdentifier, array $arguments = []): string;
 
     /**
+     * @param string $translationIdentifier
      * @param array<string|int, mixed> $arguments
      */
     public function getTranslationForIdentifier(string $translationIdentifier, array $arguments = []): string;

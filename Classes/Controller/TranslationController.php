@@ -118,7 +118,7 @@ class TranslationController extends AbstractModuleController
                 $translationOverride->setSourceIdentifier($sourceIdentifier);
                 $translationOverride->setLabelIdentifier($labelIdentifier);
                 $translationOverride->setLocaleIdentifier($localeIdentifier);
-                $translationOverride->setTranslation($translation->getTranslation() ?? '');
+                $translationOverride->setTranslation($translation?->getTranslation() ?? '');
             }
         }
 
