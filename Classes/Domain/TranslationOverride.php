@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;

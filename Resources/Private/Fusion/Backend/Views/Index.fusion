@@ -11,7 +11,11 @@ prototype(Sitegeist.CsvPO:Views.Index) < prototype(Neos.Fusion:Component) {
                 <tbody>
                     <Neos.Fusion:Loop items={translationLabelSources} itemName="source">
                     <tr>
-                        <td>{source.resourcePath}</td>
+                        <td>
+                            <Neos.Fusion:Link.Action href.action="show"  href.arguments.sourceIdentifier={source.identifier}>
+                                {source.resourcePath}
+                            </Neos.Fusion:Link.Action>
+                        </td>
                         <td class="neos-priority1 neos-aCenter">
                             <Neos.Fusion:Link.Action href.action="show"  href.arguments.sourceIdentifier={source.identifier}>
                                 <i class="fas fa-pencil-alt icon-white"></i>

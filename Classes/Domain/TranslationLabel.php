@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;
@@ -18,20 +19,20 @@ class TranslationLabel
     protected $description;
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     protected $translations;
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     protected $overrides;
 
     /**
      * TranslationLabel constructor.
      * @param string $identifier
-     * @param array $translations
-     * @param array $overrides
+     * @param array<string, string> $translations
+     * @param array<string, string> $overrides
      */
     public function __construct(string $identifier, string $description, array $translations = [], array $overrides = [])
     {
@@ -58,8 +59,7 @@ class TranslationLabel
     }
 
     /**
-     * @param array|null $localeChain
-     * @return Translation
+     * @param Locale[] $localeChain
      */
     public function findTranslationForLocaleChain(array $localeChain): Translation
     {

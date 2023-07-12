@@ -1,8 +1,10 @@
 <?php
+
 namespace Sitegeist\CsvPO\Eel;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
+use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Domain\TranslationLabelSourceRepository;
 use Sitegeist\CsvPO\Exception\TranslationLabelSourceNotFoundException;
 
@@ -20,11 +22,11 @@ class TranslationHelper implements ProtectedContextAwareInterface
      */
     public function create(string $csvFile): TranslationSourceConnector
     {
-        try {
-            $translationSource = $this->translationSourceRepository->findOneByIdentifier($csvFile);
+        $translationSource = $this->translationSourceRepository->findOneByIdentifier($csvFile);
+        if ($translationSource) {
             return new TranslationSourceConnector($translationSource);
-        } catch (TranslationLabelSourceNotFoundException $e) {
-            throw new \InvalidArgumentException($e->getMessage());
+        } else {
+            throw new TranslationLabelSourceNotFoundException(sprintf('Translation source %s was not found', $csvFile));
         }
     }
 
@@ -36,5 +38,4 @@ class TranslationHelper implements ProtectedContextAwareInterface
     {
         return $methodName == 'create';
     }
-
 }

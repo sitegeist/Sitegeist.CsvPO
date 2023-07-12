@@ -1,4 +1,5 @@
 <?php
+
 namespace Sitegeist\CsvPO;
 
 use Neos\Flow\Cache\CacheManager;
@@ -10,7 +11,6 @@ use Neos\Flow\Package\PackageManager;
 
 class Package extends BasePackage
 {
-
     /**
      * Invokes custom PHP code directly after the package manager has been initialized.
      *
@@ -23,7 +23,7 @@ class Package extends BasePackage
 
         $context = $bootstrap->getContext();
         if (!$context->isProduction()) {
-            $dispatcher->connect(Sequence::class, 'afterInvokeStep', function ($step) use ($bootstrap, $dispatcher) {
+            $dispatcher->connect(Sequence::class, 'afterInvokeStep', function ($step) use ($bootstrap) {
                 if ($step->getIdentifier() === 'neos.flow:systemfilemonitor') {
                     $templateFileMonitor = FileMonitor::createFileMonitorAtBoot('Sitegeist_Translation_Csv_Files', $bootstrap);
                     /**
@@ -51,7 +51,11 @@ class Package extends BasePackage
                 return;
             }
 
-            $templateCache = $bootstrap->getObjectManager()->get(CacheManager::class)->getCache('Sitegeist_CsvPO_TranslationCache');
+            /**
+             * @var CacheManager $cacheManager
+             */
+            $cacheManager = $bootstrap->getObjectManager()->get(CacheManager::class);
+            $templateCache = $cacheManager->getCache('Sitegeist_CsvPO_TranslationCache');
             $templateCache->flush();
         };
 

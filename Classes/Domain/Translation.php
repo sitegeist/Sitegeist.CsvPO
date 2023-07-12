@@ -1,30 +1,35 @@
 <?php
+
 namespace Sitegeist\CsvPO\Domain;
 
 class Translation
 {
     /**
-     * @var string
+     * @var string|null
      */
     protected $translation;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $override;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $fallback;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $fallbackLocaleIdentifier;
 
-    public function __construct(string $translation = null , string $override = null, string $fallback = null, string $fallbackLocaleIdentifier = null)
-    {
+    public function __construct(
+        string $translation = null,
+        string $override = null,
+        string $fallback = null,
+        string $fallbackLocaleIdentifier = null
+    ) {
         $this->translation = empty($translation) ? null : $translation;
         $this->override =  empty($override) ? null : $override;
         $this->fallback =  empty($fallback) ? null : $fallback;
