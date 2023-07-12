@@ -9,10 +9,21 @@
         "neos/fusion-form": ">1.0",
         "league/csv": "^9.2"
     },
+    "require-dev": {
+        "phpstan/phpstan": "~1.10.0",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
     "autoload": {
         "psr-4": {
             "Sitegeist\\CsvPO\\": "Classes/"
         }
+    },
+    "scripts": {
+        "fix:style": "phpcbf --colors --standard=PSR12 Classes",
+        "test:style": "phpcs --colors -n --standard=PSR12 Classes",
+        "test:stan": "phpstan analyse Classes",
+        "cc": "phpstan clear cache",
+        "test": ["composer install", "composer test:style" , "composer test:stan"]
     },
     "extra": {
         "neos": {
@@ -34,5 +45,10 @@
             "Neos.Flow-20201205172733",
             "Neos.Flow-20201207104500"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "neos/composer-plugin": true
+        }
     }
 }
