@@ -31,9 +31,9 @@ class TranslationSourceConnector extends AbstractTranslations
             $translation = $translationLabel->findTranslationForLocaleChain($localizationFallbackChain);
             if ($translation) {
                 if (isset($arguments[0]) && is_array($arguments[0])) {
-                    return $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments[0]);
+                    return $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments[0], $this->localisationService->getConfiguration()->getCurrentLocale());
                 } elseif (!empty($arguments)) {
-                    return $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments);
+                    return $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments, $this->localisationService->getConfiguration()->getCurrentLocale());
                 } else {
                     return $translation->__toString();
                 }
