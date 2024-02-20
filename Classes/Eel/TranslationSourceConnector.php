@@ -81,7 +81,7 @@ class TranslationSourceConnector implements ProtectedContextAwareInterface, \Jso
         if ($translationLabel = $this->translationSource->findTranslationLabelByIdentifier($translationIdentifier)) {
             $translation = $translationLabel->findTranslationForLocaleChain($localizationFallbackChain);
             if (isset($arguments[0]) && is_array($arguments[0])) {
-                $translationResult = $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments[0]);
+                $translationResult = $this->formatResolver->resolvePlaceholders($translation->__toString(), $arguments[0], $this->localisationService->getConfiguration()->getCurrentLocale());
             } else {
                 $translationResult = $translation->__toString();
             }
