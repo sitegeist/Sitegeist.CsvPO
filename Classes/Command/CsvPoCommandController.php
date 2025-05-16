@@ -6,7 +6,6 @@ use League\Csv\Reader;
 use League\Csv\Writer;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Cli\CommandController;
-use phpDocumentor\Reflection\Types\Boolean;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
 use Sitegeist\CsvPO\Domain\TranslationLabelSource;
@@ -56,9 +55,9 @@ class CsvPoCommandController extends CommandController
     /**
      * Show all translations
      *
-     * @param $identifier the identifier to show (globbing is supported)
+     * @param string|null $identifier the identifier to show (globbing is supported)
      */
-    public function showAllCommand(string $identifier = null): void
+    public function showAllCommand(?string $identifier = null): void
     {
         $allSources = $this->translationLabelSourceRepository->findAll();
         foreach ($allSources as $source) {
@@ -78,7 +77,7 @@ class CsvPoCommandController extends CommandController
     /**
      * Show the translations of the specified source
      *
-     * @param $identifier the identifier to show (globbing is supported)
+     * @param string $identifier the identifier to show (globbing is supported)
      */
     public function showCommand(string $identifier): void
     {
