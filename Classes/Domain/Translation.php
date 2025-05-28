@@ -25,10 +25,10 @@ class Translation
     protected $fallbackLocaleIdentifier;
 
     public function __construct(
-        string $translation = null,
-        string $override = null,
-        string $fallback = null,
-        string $fallbackLocaleIdentifier = null
+        ?string $translation = null,
+        ?string $override = null,
+        ?string $fallback = null,
+        ?string $fallbackLocaleIdentifier = null
     ) {
         $this->translation = empty($translation) ? null : $translation;
         $this->override =  empty($override) ? null : $override;
