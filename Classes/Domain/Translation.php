@@ -31,7 +31,7 @@ class Translation
         ?string $fallbackLocaleIdentifier = null
     ) {
         $this->translation = empty($translation) ? null : $translation;
-        $this->override =  empty($override) ? null : $override;
+        $this->override =  $override;
         $this->fallback =  empty($fallback) ? null : $fallback;
         $this->fallbackLocaleIdentifier = $fallbackLocaleIdentifier;
     }

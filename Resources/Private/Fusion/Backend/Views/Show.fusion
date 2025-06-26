@@ -36,7 +36,7 @@ prototype(Sitegeist.CsvPO:Views.Show) < prototype(Neos.Fusion:Component) {
                                 </div>
                             </td>
                             <td>
-                                <Neos.Fusion:Link.Action  @if={translationInLocale.override}
+                                <Neos.Fusion:Link.Action  @if={translationInLocale.override != null}
                                     href.action="updateOverride"
                                     href.arguments.sourceIdentifier={source.identifier}
                                     href.arguments.labelIdentifier={translationIdentifier}
@@ -45,7 +45,7 @@ prototype(Sitegeist.CsvPO:Views.Show) < prototype(Neos.Fusion:Component) {
                                     <i class="fas fa-pencil-alt icon-white"></i>
                                 </Neos.Fusion:Link.Action>
                                 <Neos.Fusion:Link.Action
-                                    @if={!translationInLocale.override}
+                                    @if={translationInLocale.override == null}
                                     href.action="newOverride"
                                     href.arguments.sourceIdentifier={source.identifier}
                                     href.arguments.labelIdentifier={translationIdentifier}
