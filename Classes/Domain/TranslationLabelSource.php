@@ -4,6 +4,7 @@ namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Cache\Frontend\VariableFrontend;
+use Neos\Flow\Cache\CacheManager;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use League\Csv\Reader;
@@ -49,6 +50,12 @@ class TranslationLabelSource
      * @Flow\Inject
      */
     protected $translationOverrideRepository;
+
+    /**
+     * @var CacheManager
+     * @Flow\Inject
+     */
+    protected $cacheManager;
 
     public function __construct(string $identifier)
     {
@@ -198,9 +205,20 @@ class TranslationLabelSource
      */
     public function flushCaches(): void
     {
+        // Clear the translation cache for this specific source
         $cacheIdentifier = md5($this->identifier);
         if ($this->translationCache->has($cacheIdentifier)) {
             $this->translationCache->remove($cacheIdentifier);
+        }
+
+        // Clear Fusion caches to ensure translated content is regenerated
+        // This is necessary because translations are used in Fusion prototypes
+        // that get cached separately from the translation data itself
+        if ($this->cacheManager->hasCache('Neos_Neos_Fusion')) {
+            $this->cacheManager->getCache('Neos_Neos_Fusion')->flush();
+        }
+        if ($this->cacheManager->hasCache('Neos_Fusion_Content')) {
+            $this->cacheManager->getCache('Neos_Fusion_Content')->flush();
         }
     }
 }
