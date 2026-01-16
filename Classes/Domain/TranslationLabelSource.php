@@ -46,6 +46,12 @@ class TranslationLabelSource
     protected $resourcePath;
 
     /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="management.flushNeosFusionContentCacheOnTranslationUpdate")
+     */
+    protected $flushNeosFusionContentCacheOnTranslationUpdate;
+
+    /**
      * @var TranslationOverrideRepository
      * @Flow\Inject
      */
@@ -211,13 +217,13 @@ class TranslationLabelSource
             $this->translationCache->remove($cacheIdentifier);
         }
 
-        // Clear Fusion caches to ensure translated content is regenerated
+        // Clear Fusion content cache to ensure translated content is regenerated
         // This is necessary because translations are used in Fusion prototypes
-        // that get cached separately from the translation data itself
-        if ($this->cacheManager->hasCache('Neos_Neos_Fusion')) {
-            $this->cacheManager->getCache('Neos_Neos_Fusion')->flush();
-        }
-        if ($this->cacheManager->hasCache('Neos_Fusion_Content')) {
+        // that get cached separately from the translation data itself.
+        // Note: We only flush Neos_Fusion_Content (rendered output), not Neos_Neos_Fusion
+        // (parsed Fusion AST) since the latter only needs flushing when Fusion files change.
+        if ($this->flushNeosFusionContentCacheOnTranslationUpdate
+            && $this->cacheManager->hasCache('Neos_Fusion_Content')) {
             $this->cacheManager->getCache('Neos_Fusion_Content')->flush();
         }
     }
