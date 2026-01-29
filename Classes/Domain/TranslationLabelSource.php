@@ -222,8 +222,10 @@ class TranslationLabelSource
         // that get cached separately from the translation data itself.
         // Note: We only flush Neos_Fusion_Content (rendered output), not Neos_Neos_Fusion
         // (parsed Fusion AST) since the latter only needs flushing when Fusion files change.
-        if ($this->flushNeosFusionContentCacheOnTranslationUpdate
-            && $this->cacheManager->hasCache('Neos_Fusion_Content')) {
+        if (
+            $this->flushNeosFusionContentCacheOnTranslationUpdate
+            && $this->cacheManager->hasCache('Neos_Fusion_Content')
+        ) {
             $this->cacheManager->getCache('Neos_Fusion_Content')->flush();
         }
     }
