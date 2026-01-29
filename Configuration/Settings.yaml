@@ -24,6 +24,9 @@ Sitegeist:
       # folder inside the package resources to search for translations
       resourcePath: 'Private/Fusion'
 
+      # automatically flush the Neos Fusion content cache to make sure the updated translations are used
+      flushNeosFusionContentCacheOnTranslationUpdate: false
+
 Neos:
   Fusion:
     defaultContext:

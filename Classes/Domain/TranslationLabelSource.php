@@ -4,6 +4,7 @@ namespace Sitegeist\CsvPO\Domain;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Cache\Frontend\VariableFrontend;
+use Neos\Flow\Cache\CacheManager;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use League\Csv\Reader;
@@ -45,10 +46,22 @@ class TranslationLabelSource
     protected $resourcePath;
 
     /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="management.flushNeosFusionContentCacheOnTranslationUpdate")
+     */
+    protected $flushNeosFusionContentCacheOnTranslationUpdate;
+
+    /**
      * @var TranslationOverrideRepository
      * @Flow\Inject
      */
     protected $translationOverrideRepository;
+
+    /**
+     * @var CacheManager
+     * @Flow\Inject
+     */
+    protected $cacheManager;
 
     public function __construct(string $identifier)
     {
@@ -198,9 +211,22 @@ class TranslationLabelSource
      */
     public function flushCaches(): void
     {
+        // Clear the translation cache for this specific source
         $cacheIdentifier = md5($this->identifier);
         if ($this->translationCache->has($cacheIdentifier)) {
             $this->translationCache->remove($cacheIdentifier);
+        }
+
+        // Clear Fusion content cache to ensure translated content is regenerated
+        // This is necessary because translations are used in Fusion prototypes
+        // that get cached separately from the translation data itself.
+        // Note: We only flush Neos_Fusion_Content (rendered output), not Neos_Neos_Fusion
+        // (parsed Fusion AST) since the latter only needs flushing when Fusion files change.
+        if (
+            $this->flushNeosFusionContentCacheOnTranslationUpdate
+            && $this->cacheManager->hasCache('Neos_Fusion_Content')
+        ) {
+            $this->cacheManager->getCache('Neos_Fusion_Content')->flush();
         }
     }
 }

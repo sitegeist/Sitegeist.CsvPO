@@ -213,17 +213,27 @@ Sitegeist:
 
       # folder inside the package resources to search for translations
       resourcePath: 'Private/Fusion'
+
+      # automatically flush the Neos Fusion content cache when translation overrides are updated via the backend module. 
+      # Enable this if you need instant translation updates.
+      flushNeosFusionContentCacheOnTranslationUpdate: false
 ```
 
 ## Caching
 
 Translations are cached in the `Sitegeist_CsvPO_TranslationCache` Cache.
-A file monitor will invalidate the caches whenever a .csv file is changed 
-inside a Fusion Folder of any Flow-Package. 
+A file monitor will invalidate the caches whenever a .csv file is changed
+inside a Fusion Folder of any Flow-Package.
 
 If you are storing the translation csv files in another place make sure to
 call `./flow cache:flushone Sitegeist_CsvPO_TranslationCache` after changing
 a translation.csv.
+
+**Note on Fusion content caching:** When translation overrides are updated through
+the backend module, you may need to flush the `Neos_Fusion_Content` cache to see
+changes immediately in the frontend. This can be automated by enabling the
+`flushNeosFusionContentCacheOnTranslationUpdate` setting (see Configuration section above).
+By default, this is disabled to avoid performance impacts on high-traffic sites.
 
 ### Installation 
 
