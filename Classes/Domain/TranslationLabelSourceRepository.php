@@ -52,6 +52,21 @@ class TranslationLabelSourceRepository
     /**
      * @return TranslationLabelSource[]
      */
+    public function findBySearchTerm(string $searchTerm): array
+    {
+        $all = $this->findAll();
+        $results = [];
+        foreach ($all as $translationSource) {
+            if ($translationSource->containsSearchTerm($searchTerm)) {
+                $results[] = $translationSource;
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * @return TranslationLabelSource[]
+     */
     public function findAll(): array
     {
         $translationIdentifiers = [];

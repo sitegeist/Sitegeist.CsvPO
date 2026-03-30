@@ -8,6 +8,7 @@ use Neos\Flow\Security\Exception\AccessDeniedException;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\I18n\Service as LocalizationService;
+use Sitegeist\CsvPO\Domain\TranslationLabelSource;
 use Sitegeist\CsvPO\Domain\TranslationLabelSourceRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
@@ -58,16 +59,32 @@ class TranslationController extends AbstractModuleController
         parent::initializeAction();
     }
 
-    public function indexAction(): void
+    public function indexAction(?string $searchTerm = null): void
     {
-        $translationLabelSources = $this->translationLabelSourceRepository->findAll();
+        if (is_string($searchTerm) && !empty($searchTerm)) {
+            $translationLabelSources = $this->translationLabelSourceRepository->findBySearchTerm($searchTerm);
+        } else {
+            $translationLabelSources = $this->translationLabelSourceRepository->findAll();
+        }
+
         $translationLabelSourcesGroupedByPackageKey = [];
         foreach ($translationLabelSources as $translationLabelSource) {
             if (!array_key_exists($translationLabelSource->getPackageKey(), $translationLabelSourcesGroupedByPackageKey)) {
                 $translationLabelSourcesGroupedByPackageKey[$translationLabelSource->getPackageKey()] = [];
             }
-            $translationLabelSourcesGroupedByPackageKey[$translationLabelSource->getPackageKey()][] = $translationLabelSource;
+            $translationLabelSourcesGroupedByPackageKey[$translationLabelSource->getPackageKey()][$translationLabelSource->getDirname()][$translationLabelSource->getFilename()] = $translationLabelSource;
         }
+
+        // sort
+        foreach (array_keys($translationLabelSourcesGroupedByPackageKey) as $packageKey) {
+            foreach (array_keys($translationLabelSourcesGroupedByPackageKey[$packageKey]) as $directory) {
+                ksort($translationLabelSourcesGroupedByPackageKey[$packageKey][$directory]);
+            }
+            ksort($translationLabelSourcesGroupedByPackageKey[$packageKey]);
+        }
+        ksort($translationLabelSourcesGroupedByPackageKey);
+
+        $this->view->assign('searchTerm', $searchTerm);
         $this->view->assign('translationLabelSources', $translationLabelSources);
         $this->view->assign('translationLabelSourcesGroupedByPackageKey', $translationLabelSourcesGroupedByPackageKey);
     }
