@@ -165,6 +165,44 @@ class TranslationLabelSource
         return implode("/", $parts);
     }
 
+    public function getDirname(): string
+    {
+        $path = str_replace("resource://", '', $this->identifier);
+        return dirname($path);
+    }
+
+    public function getFilename(): string
+    {
+        return basename($this->identifier);
+    }
+
+    public function containsSearchTerm(string $query): bool
+    {
+        $csv = $this->readCsvData();
+        foreach ($csv as $labelIdentifier => $row) {
+            if (str_contains($labelIdentifier, $query)) {
+                return true;
+            }
+            foreach ($row as $translation) {
+                if (is_string($translation) && str_contains($translation, $query)) {
+                    return true;
+                }
+            }
+        }
+        $overrides = $this->readOverrideData();
+        foreach (array_keys($overrides) as $labelIdentifier) {
+            if (str_contains($labelIdentifier, $query)) {
+                return true;
+            }
+            foreach ($overrides[$labelIdentifier] as $translation) {
+                if (str_contains($translation, $query)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * @return array<string, array<string, string|null>>
      */
