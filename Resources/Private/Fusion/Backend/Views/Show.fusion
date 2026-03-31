@@ -62,5 +62,15 @@ prototype(Sitegeist.CsvPO:Views.Show) < prototype(Neos.Fusion:Component) {
         </div>
 
 
+        <Neos.Fusion:Link.Action
+            @if={translationInLocale.override == null}
+            href.action="newTranslation"
+            href.arguments.sourceIdentifier={source.identifier}
+            href.arguments.labelIdentifier={translationIdentifier}
+            href.arguments.localeIdentifier={localeIdentifier}
+            class="neos-button"
+        >
+            <i class="fas fa-plus icon-white"></i> add Translation
+        </Neos.Fusion:Link.Action>
     `
 }

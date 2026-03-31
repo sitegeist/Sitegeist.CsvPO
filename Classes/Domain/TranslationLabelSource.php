@@ -83,8 +83,15 @@ class TranslationLabelSource
             $this->translationCache->set($cacheIdentifier, $translationData);
         }
 
+        $labelIdentifiers = array_unique(
+            [
+                ... array_keys($translationData['translations']),
+                ...array_keys($translationData['overrides'])
+            ]
+        );
+
         // instantiate the translation objects
-        foreach (array_keys($translationData['translations']) as $labelIdentifier) {
+        foreach ($labelIdentifiers as $labelIdentifier) {
             $labelIdentifier = (string) $labelIdentifier;
             $this->translations[$labelIdentifier] = new TranslationLabel(
                 $labelIdentifier,

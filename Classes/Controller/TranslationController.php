@@ -144,6 +144,17 @@ class TranslationController extends AbstractModuleController
         $this->view->assign('translationOverride', $translationOverride);
     }
 
+    /**
+     * @param string $sourceIdentifier
+     */
+    public function newTranslationAction(string $sourceIdentifier): void
+    {
+        $translationLabelSource = $this->translationLabelSourceRepository->findOneByIdentifier($sourceIdentifier);
+        $this->view->assign('source', $translationLabelSource);
+        $this->view->assign('sourceIdentifier', $sourceIdentifier);
+        $this->view->assign('locales', $this->locales);
+    }
+
     public function addOverrideAction(TranslationOverride $translationOverride): void
     {
         $this->translationOverrideRepository->add($translationOverride);
