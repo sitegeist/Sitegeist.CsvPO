@@ -1,0 +1,44 @@
+prototype(Sitegeist.CsvPO:Views.NewTranslation) < prototype(Neos.Fusion:Component) {
+    renderer = afx`
+        <legend>Create translation in {source.name}</legend>
+        <p>{source.identifier}</p><br/>
+
+        <Neos.Fusion.Form:Form
+            form.target.action="addOverride"
+            form.data.translationOverride={translationOverride}
+        >
+            <Neos.Fusion.Form:Hidden field.name="translationOverride[sourceIdentifier]" field.value={sourceIdentifier} />
+
+            <div class="neos-control-group">
+                <label class="neos-control-label" for="translation">Identifier</label>
+                <div class="neos-controls neos-controls-row">
+                    <Neos.Fusion.Form:Input field.name="translationOverride[labelIdentifier]" attributes.class="neos-span12" attributes.pattern="[a-zA-Z0-9\\-_]*" attributes.required/>
+                </div>
+            </div>
+
+            <div class="neos-control-group">
+                <label class="neos-control-label" for="translation">Locale</label>
+                <div class="neos-controls neos-controls-row">
+                    <Neos.Fusion.Form:Select field.name="translationOverride[localeIdentifier]" attributes.class="neos-span12"  attributes.required >
+                        <Neos.Fusion:Loop items={locales} itemName="locale">
+                            <Neos.Fusion.Form:Select.Option option.value={locale}>{locale}</Neos.Fusion.Form:Select.Option>
+                        </Neos.Fusion:Loop>
+                    </Neos.Fusion.Form:Select>
+                </div>
+            </div>
+
+            <div class="neos-control-group">
+                <label class="neos-control-label" for="translation">Translation</label>
+                <div class="neos-controls neos-controls-row">
+                    <Neos.Fusion.Form:Textarea field.name="translationOverride[translation]" attributes.class="neos-span12"  attributes.required />
+                </div>
+            </div>
+
+            <div class="neos-footer">
+                <Neos.Fusion:Link.Action href.action="show" class="neos-button" href.arguments.sourceIdentifier={source.identifier}>Back</Neos.Fusion:Link.Action>
+                <Neos.Fusion.Form:Button attributes.class="neos-button neos-button-primary">Add Translation</Neos.Fusion.Form:Button>
+            </div>
+
+        </Neos.Fusion.Form:Form>
+    `
+}
