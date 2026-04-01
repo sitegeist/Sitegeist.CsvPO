@@ -4,7 +4,7 @@ prototype(Sitegeist.CsvPO:Views.Index) < prototype(Neos.Fusion:Component) {
         <Neos.Fusion.Form:Form form.target.action="index" >
             <div class="neos-search-bar">
                 <button class="neos-button"><i class="fas fa-search"></i></button>
-                <Neos.Fusion.Form:Input placeholder="Search" autofocus="autofocus" type="search" field.name="searchTerm" value="" />
+                <Neos.Fusion.Form:Input placeholder="Search" autofocus="autofocus" type="search" field.name="searchTerm" field.value={searchTerm} />
                 <Neos.Fusion:Link.Action href.action="index" class="neos-button">
                     <i class="fas fa-times"></i>
                 </Neos.Fusion:Link.Action>
