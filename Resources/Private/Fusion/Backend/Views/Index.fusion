@@ -11,7 +11,7 @@ prototype(Sitegeist.CsvPO:Views.Index) < prototype(Neos.Fusion:Component) {
             </div>
         </Neos.Fusion.Form:Form>
 
-        <legend>Available translation sources {searchTerm ? searchTerm : '--'}</legend>
+        <legend>Available translation sources {searchTerm ? ' with "' + searchTerm + '"': ''}</legend>
 
         <Neos.Fusion:Loop items={translationLabelSourcesGroupedByPackageKey} itemName="translationLabelSources" itemKey="packageKey">
             <table class="neos-table">
