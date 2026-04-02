@@ -46,7 +46,9 @@ class TranslationsChain extends AbstractTranslations
         foreach ($translationLabelSourcesInReverseOrder as $translationSource) {
             foreach ($translationSource->findAllTranslationLabels() as $translationLabel) {
                 $translation = $translationLabel->findTranslationForLocaleChain($localizationFallbackChain);
-                $result[$translationLabel->getIdentifier()] = (string)$translation;
+                if ($translation !== null) {
+                    $result[$translationLabel->getIdentifier()] = (string)$translation;
+                }
             }
         }
         return $result;
