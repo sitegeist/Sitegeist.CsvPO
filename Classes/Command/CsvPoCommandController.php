@@ -5,6 +5,7 @@ namespace Sitegeist\CsvPO\Command;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Cache\CacheManager;
 use Neos\Flow\Cli\CommandController;
 use Sitegeist\CsvPO\Domain\TranslationOverrideRepository;
 use Sitegeist\CsvPO\Domain\TranslationOverride;
@@ -34,10 +35,22 @@ class CsvPoCommandController extends CommandController
     protected $locales;
 
     /**
+     * @var bool
+     * @Flow\InjectConfiguration(path="management.flushNeosFusionContentCacheOnTranslationUpdate")
+     */
+    protected $flushNeosFusionContentCacheOnTranslationUpdate;
+
+    /**
      * @var LocalizationService
      * @Flow\Inject
      */
     protected $localizationService;
+
+    /**
+     * @var CacheManager
+     * @Flow\Inject
+     */
+    protected $cacheManager;
 
     /**
      * Show a list of all translation sources
@@ -129,10 +142,7 @@ class CsvPoCommandController extends CommandController
             }
         }
 
-        $allSources = $this->translationLabelSourceRepository->findAll();
-        foreach ($allSources as $source) {
-            $this->resetSource($source);
-        }
+        $this->resetAll();
     }
 
     /**
@@ -248,5 +258,17 @@ class CsvPoCommandController extends CommandController
 
         // flush caches
         $source->flushCaches();
+    }
+
+    protected function resetAll(): void
+    {
+        $this->output->outputLine('Reset all');
+        $this->translationOverrideRepository->removeAll();
+
+        // flush caches
+        $this->cacheManager->getCache('Sitegeist_CsvPO_TranslationCache')->flush();
+        if ($this->flushNeosFusionContentCacheOnTranslationUpdate) {
+            $this->cacheManager->getCache('Neos_Fusion_Content')->flush();
+        }
     }
 }
